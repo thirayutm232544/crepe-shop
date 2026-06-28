@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🥞 ระบบร้านเครป</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#FF6B35;--orange-lt:#FFF3EE;--orange-dk:#D94F1A;
+  --gold:#F5A623;--gold-lt:#FFFBF0;
+  --cream:#FFFDF9;--cream2:#FFF8F0;
+  --brown:#4A2C0A;--brown-md:#7C4A1E;--brown-lt:#F9F0E6;
+  --green:#22C55E;--green-lt:#F0FDF4;
+  --red:#EF4444;--red-lt:#FEF2F2;
+  --blue:#3B82F6;--blue-lt:#EFF6FF;
+  --purple:#8B5CF6;--purple-lt:#F5F3FF;
+  --amber:#F59E0B;--amber-lt:#FFFBEB;
+  --card:#FFFFFF;--border:#F0E6D8;
+  --text:#2A1500;--muted:#9C7B5A;
+  --radius:14px;--nav-h:60px;--tab-h:60px;
+  --shadow:0 2px 12px rgba(74,44,10,.08);
+}
+body{font-family:'Sarabun','Noto Sans Thai',sans-serif;background:var(--cream);color:var(--text);font-size:15px;padding-bottom:calc(var(--tab-h)+12px);-webkit-tap-highlight-color:transparent;min-height:100vh}
+
+/* TOP BAR */
+.topbar{position:sticky;top:0;z-index:100;background:var(--orange);padding:0 16px;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(255,107,53,.3)}
+.logo{font-size:19px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px;letter-spacing:-.3px}
+.logo .sub{font-size:11px;font-weight:600;opacity:.8;letter-spacing:.3px}
+.topbar-right{font-size:11px;color:rgba(255,255,255,.85);text-align:right;line-height:1.5}
+
+/* BOTTOM TAB */
+.bottom-tab{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#fff;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(7,1fr);height:var(--tab-h);box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.tab-btn{border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--muted);font-size:8.5px;font-weight:700;padding:4px 2px;transition:color .15s;letter-spacing:.2px}
+.tab-btn i{font-size:19px;transition:color .15s}
+.tab-btn.active{color:var(--orange)}
+.tab-btn.active i{color:var(--orange)}
+
+/* PAGES */
+.page{display:none;padding:14px;min-height:calc(100dvh - var(--nav-h) - var(--tab-h))}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.card+.card,.card+.mt{margin-top:12px}
+.mt{margin-top:12px}
+.card-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,var(--orange))}
+.stat-lbl{font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:21px;font-weight:900;margin-top:5px;color:var(--accent,var(--text))}
+
+/* FORM */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:#fff;color:var(--text);outline:none;transition:border-color .15s;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange)}
+.field textarea{resize:vertical;min-height:72px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:10px;border:none;font-size:14px;font-weight:800;cursor:pointer;transition:all .15s;font-family:inherit;letter-spacing:.1px}
+.btn:active{transform:scale(.97);opacity:.85}
+.btn-primary{background:var(--orange);color:#fff;width:100%;padding:14px;font-size:15px;border-radius:12px;box-shadow:0 4px 14px rgba(255,107,53,.35)}
+.btn-secondary{background:#fff;border:1.5px solid var(--border);color:var(--muted);width:100%}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-ghost{background:var(--orange-lt);color:var(--orange);border:1.5px solid rgba(255,107,53,.2)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:800;letter-spacing:.2px}
+.badge-green{background:var(--green-lt);color:#15803D}
+.badge-red{background:var(--red-lt);color:#991B1B}
+.badge-amber{background:var(--amber-lt);color:#92400E}
+.badge-blue{background:var(--blue-lt);color:#1E40AF}
+.badge-orange{background:var(--orange-lt);color:var(--orange-dk)}
+.badge-purple{background:var(--purple-lt);color:#6D28D9}
+.badge-muted{background:var(--border);color:var(--muted)}
+
+/* LIST ROWS */
+.row-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.row-item:last-child{border-bottom:none}
+.row-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.row-info{flex:1;min-width:0}
+.row-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.row-right{text-align:right;flex-shrink:0}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:12px}
+.search-wrap input{padding-left:38px;background:#fff}
+.search-wrap i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px}
+
+/* SEC HEADER */
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:16px;font-weight:900;color:var(--brown)}
+
+/* BAR CHART */
+.bar-item{margin-bottom:10px}
+.bar-meta{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;font-weight:600}
+.bar-track{background:var(--border);border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--orange),var(--gold));transition:width .5s}
+
+/* CHIP */
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{padding:5px 12px;background:#fff;border:1.5px solid var(--border);border-radius:20px;font-size:12.5px;color:var(--muted);cursor:pointer;font-weight:700;transition:all .15s}
+.chip.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* CREPE CARD GRID */
+.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.prod-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;position:relative;transition:border-color .15s;box-shadow:var(--shadow)}
+.prod-card:active{border-color:var(--orange);transform:scale(.98)}
+.prod-card.disabled{opacity:.4;pointer-events:none}
+.prod-emoji{width:100%;aspect-ratio:1;border-radius:9px;background:var(--orange-lt);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:8px}
+.prod-name{font-size:13px;font-weight:800;margin-bottom:2px;color:var(--brown)}
+.prod-price{font-size:15px;font-weight:900;color:var(--orange);margin-top:4px}
+.prod-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+.prod-badge{position:absolute;top:8px;right:8px;background:var(--orange);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+
+/* POS OPTION CARD */
+.opt-group{margin-bottom:16px}
+.opt-label{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.opt-row{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:border-color .15s;background:#fff}
+.opt-row:has(input:checked){border-color:var(--orange);background:var(--orange-lt)}
+.opt-row input{accent-color:var(--orange);width:16px;height:16px;flex-shrink:0}
+.opt-name{flex:1;font-size:14px;font-weight:600}
+.opt-price{font-size:13px;color:var(--muted);font-weight:700}
+.opt-price.free{color:var(--green)}
+
+/* CART FAB */
+.cart-fab{position:fixed;bottom:calc(var(--tab-h)+14px);right:16px;background:var(--orange);color:#fff;border:none;border-radius:50px;padding:12px 18px;font-size:13px;font-weight:800;display:flex;align-items:center;gap:8px;box-shadow:0 6px 24px rgba(255,107,53,.45);cursor:pointer;z-index:90;letter-spacing:.1px}
+
+/* DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-radius:18px 18px 0 0;padding:16px;z-index:201;max-height:88vh;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-height:92vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:900;margin-bottom:16px;color:var(--brown)}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--border);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+
+/* RECEIPT */
+.receipt-item{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)}
+.receipt-total{display:flex;justify-content:space-between;font-size:17px;font-weight:900;padding-top:10px;color:var(--orange)}
+
+/* PROGRESS */
+.progress-bar{background:var(--border);border-radius:4px;height:7px;overflow:hidden;margin-top:5px}
+.progress-fill{height:100%;border-radius:4px;background:var(--green)}
+.progress-fill.warn{background:var(--amber)}
+.progress-fill.danger{background:var(--red)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:12px 0}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:36px 16px;color:var(--muted)}
+.empty-state i{font-size:44px;display:block;margin-bottom:8px;opacity:.35}
+.empty-state p{font-size:13px}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--tab-h)+75px);left:50%;transform:translateX(-50%);background:#2A1500;color:#fff;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:700;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.show{opacity:1}
+
+/* QTY STEPPER */
+.stepper{display:flex;align-items:center;gap:0;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}
+.stepper button{width:40px;height:40px;border:none;background:none;font-size:20px;font-weight:900;cursor:pointer;color:var(--orange);display:flex;align-items:center;justify-content:center;transition:background .15s}
+.stepper button:active{background:var(--orange-lt)}
+.stepper span{flex:1;text-align:center;font-size:18px;font-weight:900;min-width:40px;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+
+/* MENU MGMT CARD */
+.menu-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:var(--shadow)}
+.menu-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.menu-chip{display:inline-flex;align-items:center;gap:6px;background:var(--orange-lt);color:var(--orange-dk);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700}
+.action-row{display:flex;gap:6px;margin-top:10px}
+
+/* SWITCH */
+.switch{position:relative;display:inline-block;width:44px;height:24px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border);border-radius:24px;transition:.3s}
+.slider:before{position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+input:checked+.slider{background:var(--orange)}
+input:checked+.slider:before{transform:translateX(20px)}
+
+/* HISTORY */
+.order-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* REPORT CHART */
+.donut-section{text-align:center;padding:8px 0 16px}
+
+/* SETTINGS */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-label{font-size:14px;font-weight:700}
+.setting-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* SCROLLABLE TABS */
+.scroll-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.scroll-tabs::-webkit-scrollbar{display:none}
+
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* HIGHLIGHT ORANGE INPUT */
+.color-block{width:28px;height:28px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0}
+
+/* INCOMING ORDERS */
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.incoming-card{background:#fff;border:1.5px solid var(--red);border-radius:12px;padding:12px;margin-bottom:8px;box-shadow:0 2px 12px rgba(239,68,68,.12)}
+.incoming-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.incoming-num{font-size:13px;font-weight:900;color:var(--red)}
+.incoming-time{font-size:11px;color:var(--muted)}
+.incoming-items{font-size:13px;color:var(--text);line-height:1.8;margin-bottom:8px}
+.incoming-total{font-size:15px;font-weight:900;color:var(--orange)}
+.incoming-actions{display:flex;gap:7px;margin-top:10px}
+
+/* WIZARD */
+.wiz-dot{width:28px;height:28px;border-radius:50%;background:var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--muted);transition:all .25s}
+.wiz-dot.active{background:var(--orange);color:#fff;box-shadow:0 3px 10px rgba(255,107,53,.4)}
+.wiz-dot.done{background:var(--green);color:#fff}
+.wiz-line{flex:1;height:2px;background:var(--border);transition:background .25s}
+.wiz-line.done{background:var(--green)}
+.wiz-panel-title{font-size:17px;font-weight:900;color:var(--brown);margin-bottom:14px}
+.wiz-selected-product{background:var(--orange-lt);border:1.5px solid rgba(255,107,53,.2);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.wiz-panel{}
+/* POS order item card */
+.pos-order-item{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.pos-order-item-info{flex:1;min-width:0}
+.pos-order-item-name{font-size:14px;font-weight:800;color:var(--brown)}
+.pos-order-item-opts{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pos-order-item-price{font-size:15px;font-weight:900;color:var(--orange);flex-shrink:0}
+.wiz-opt-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;margin-bottom:8px;cursor:pointer;transition:all .15s;background:#fff;-webkit-tap-highlight-color:transparent}
+.wiz-opt-row:active{transform:scale(.98)}
+.wiz-opt-row.selected{border-color:var(--orange);background:var(--orange-lt)}
+.wiz-opt-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:13px}
+.wiz-opt-row.selected .wiz-opt-check{background:var(--orange);border-color:var(--orange);color:#fff}
+.wiz-radio-row{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid var(--border);border-radius:11px;margin-bottom:8px;cursor:pointer;transition:all .15s;background:#fff}
+.wiz-radio-row.selected{border-color:var(--orange);background:var(--orange-lt)}
+.wiz-radio-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.wiz-radio-dot::after{content:'';width:10px;height:10px;border-radius:50%;background:transparent;transition:background .2s}
+.wiz-radio-row.selected .wiz-radio-dot{border-color:var(--orange)}
+.wiz-radio-row.selected .wiz-radio-dot::after{background:var(--orange)}
+.wiz-opt-name{flex:1;font-size:14px;font-weight:700}
+.wiz-opt-emoji{font-size:22px;flex-shrink:0}
+.wiz-opt-price{font-size:13px;font-weight:800;color:var(--muted)}
+.wiz-opt-price.free{color:var(--green)}
+/* empty order state */
+.pos-empty-order{text-align:center;padding:32px 16px;background:var(--card);border:2px dashed var(--border);border-radius:14px;margin-bottom:14px}
+.pos-empty-order i{font-size:44px;color:var(--border);display:block;margin-bottom:8px}
+.pos-empty-order p{font-size:14px;color:var(--muted);font-weight:600}
+
+/* CALENDAR */
+.cal-toggle-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--orange-lt);color:var(--orange);border:1.5px solid rgba(255,107,53,.25);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.cal-toggle-btn:active{opacity:.7}
+.cal-toggle-btn.open{background:var(--orange);color:#fff;border-color:var(--orange)}
+.cal-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;box-shadow:var(--shadow);margin-bottom:12px}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-title{font-size:14px;font-weight:900;color:var(--brown)}
+.cal-nav{background:none;border:1.5px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center}
+.cal-nav:active{background:var(--orange-lt);color:var(--orange)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cal-dow{text-align:center;font-size:10px;font-weight:800;color:var(--muted);padding:3px 0}
+.cal-day{text-align:center;font-size:12px;font-weight:600;padding:6px 2px;cursor:pointer;position:relative;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:0;transition:background .1s}
+.cal-day:hover{background:var(--orange-lt);color:var(--orange);border-radius:6px}
+.cal-day.other-month{color:var(--border);pointer-events:none}
+/* today */
+.cal-day.today > span.cal-num{background:var(--orange);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+/* range */
+.cal-day.in-range{background:var(--orange-lt)}
+.cal-day.range-start{background:var(--orange-lt);border-radius:6px 0 0 6px}
+.cal-day.range-end{background:var(--orange-lt);border-radius:0 6px 6px 0}
+.cal-day.range-start > span.cal-num,
+.cal-day.range-end > span.cal-num{background:var(--orange);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-weight:900}
+.cal-day.range-start.range-end{border-radius:6px}
+/* dot */
+.cal-dot{width:4px;height:4px;border-radius:50%;background:var(--orange)}
+.cal-day.today .cal-dot{background:rgba(255,255,255,.7)}
+.cal-day.in-range .cal-dot,.cal-day.range-start .cal-dot,.cal-day.range-end .cal-dot{background:var(--orange-dk)}
+/* range info bar */
+.cal-range-bar{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding:8px 10px;background:var(--orange-lt);border-radius:8px;font-size:12px;font-weight:700;color:var(--orange-dk)}
+.cal-range-clear{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;font-weight:700;font-family:inherit}
+.cal-range-clear:active{color:var(--red)}
+
+@media(max-width:380px){
+  .stat-val{font-size:18px}
+  .prod-emoji{font-size:32px}
+  .cal-day{font-size:11px;padding:4px 1px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">🥞 <span>เครปโปร</span> <span class="sub">POS System</span></div>
+  <div class="topbar-right" id="top-date"></div>
+</div>
+
+<!-- ========== PAGE: DASHBOARD ========== -->
+<div class="page active" id="page-dash">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-size:12px;font-weight:700;color:var(--muted)" id="cal-dash-selected-label"></div>
+    <button class="cal-toggle-btn" onclick="calToggle('dash')"><i class="ti ti-calendar"></i> เลือกช่วงวัน</button>
+  </div>
+  <div class="cal-wrap" id="cal-dash-wrap" style="display:none">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calMove('dash',-1)">‹</button>
+      <div class="cal-title" id="cal-dash-title"></div>
+      <button class="cal-nav" onclick="calMove('dash',1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-dash-grid"></div>
+    <div class="cal-range-bar" id="cal-dash-bar" style="display:none">
+      <span id="cal-dash-range-txt"></span>
+      <button class="cal-range-clear" onclick="calClear('dash')">✕ ล้าง</button>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;gap:10px">
+      <span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:var(--orange);display:inline-block"></span>มียอดขาย</span>
+      <span id="cal-dash-hint" style="color:var(--orange-dk)">กดวันเริ่มต้น</span>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card" style="--accent:var(--orange)">
+      <div class="stat-lbl">ยอดขายวันนี้</div>
+      <div class="stat-val" id="d-sales">฿0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--green)">
+      <div class="stat-lbl">กำไรวันนี้</div>
+      <div class="stat-val" id="d-profit">฿0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--gold)">
+      <div class="stat-lbl">ออเดอร์วันนี้</div>
+      <div class="stat-val" id="d-orders">0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--blue)">
+      <div class="stat-lbl">ยอดขายเดือนนี้</div>
+      <div class="stat-val" id="d-month">฿0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🏆 หน้า/ท็อปปิ้งขายดีวันนี้</div>
+    <div id="d-top-items"></div>
+  </div>
+
+  <div class="card mt">
+    <div class="card-title">⚠️ วัตถุดิบใกล้หมด</div>
+    <div id="d-low-stock"></div>
+  </div>
+
+  <div class="card mt">
+    <div class="card-title">📋 ออเดอร์ล่าสุด</div>
+    <div id="d-recent-orders"></div>
+  </div>
+</div>
+
+<!-- ========== PAGE: POS ========== -->
+<div class="page" id="page-pos">
+
+  <!-- ── STEP 0: ORDER SUMMARY (main view) ── -->
+  <div id="pos-view-summary">
+
+    <!-- INCOMING CUSTOMER ORDERS PANEL -->
+    <div id="incoming-panel" style="display:none;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:900;color:var(--brown);display:flex;align-items:center;gap:6px">
+          <span style="width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 1s infinite"></span>
+          ออเดอร์จากลูกค้า
+        </div>
+        <span id="incoming-count" style="background:var(--red);color:#fff;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:900">0</span>
+      </div>
+      <div id="incoming-list"></div>
+    </div>
+
+    <!-- sticky order bar -->
+    <div id="pos-order-bar" style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)">
+      <div>
+        <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">ออเดอร์ปัจจุบัน</div>
+        <div id="pos-order-count" style="font-size:22px;font-weight:900;color:var(--orange)">0 ชิ้น</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--muted);font-weight:700">ยอดรวม</div>
+        <div id="pos-order-total" style="font-size:22px;font-weight:900;color:var(--green)">฿0</div>
+      </div>
+    </div>
+
+    <!-- current order items list -->
+    <div id="pos-order-items" style="margin-bottom:14px"></div>
+
+    <!-- action buttons -->
+    <button class="btn btn-primary" onclick="posStartBuild()" style="margin-bottom:10px">
+      <i class="ti ti-plus"></i> เพิ่มเครปชิ้นใหม่
+    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn" style="background:var(--amber-lt);color:var(--amber);border:1.5px solid rgba(245,166,35,.25);font-weight:800" onclick="openModal('modal-discount')">
+        <i class="ti ti-tag"></i> ส่วนลด
+      </button>
+      <button class="btn btn-green" onclick="posCheckout()" id="pos-checkout-btn" disabled style="opacity:.4">
+        <i class="ti ti-cash"></i> บันทึกการขาย
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STEP WIZARD (เพิ่มเครป) ── -->
+  <div id="pos-view-wizard" style="display:none">
+
+    <!-- step progress bar -->
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <button onclick="posWizardBack()" style="background:none;border:none;color:var(--muted);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:4px;padding:4px 0">
+          <i class="ti ti-chevron-left" style="font-size:18px"></i> ย้อนกลับ
+        </button>
+        <span id="wiz-step-label" style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px"></span>
+        <button onclick="posWizardCancel()" style="background:none;border:none;color:var(--red);font-size:12px;font-weight:700;cursor:pointer;padding:4px 0">ยกเลิก</button>
+      </div>
+      <!-- step dots -->
+      <div style="display:flex;gap:4px;align-items:center">
+        <div class="wiz-dot" id="dot-0"></div>
+        <div class="wiz-line"></div>
+        <div class="wiz-dot" id="dot-1"></div>
+        <div class="wiz-line"></div>
+        <div class="wiz-dot" id="dot-2"></div>
+        <div class="wiz-line"></div>
+        <div class="wiz-dot" id="dot-3"></div>
+        <div class="wiz-line"></div>
+        <div class="wiz-dot" id="dot-4"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase">
+        <span>เมนู</span><span>แป้ง</span><span>หน้า</span><span>ท็อปปิ้ง</span><span>จำนวน</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: เลือกเมนูหลัก -->
+    <div id="wiz-step-1" class="wiz-panel" style="display:none">
+      <div class="wiz-panel-title">🥞 เลือกเมนู</div>
+      <div class="scroll-tabs" id="wiz-cat-tabs">
+        <span class="chip active" onclick="setWizCat('all',this)">ทั้งหมด</span>
+        <span class="chip" onclick="setWizCat('เครปกรอบ',this)">เครปกรอบ</span>
+        <span class="chip" onclick="setWizCat('เครปนิ่ม',this)">เครปนิ่ม</span>
+        <span class="chip" onclick="setWizCat('เครปหวาน',this)">เครปหวาน</span>
+        <span class="chip" onclick="setWizCat('เครื่องดื่ม',this)">เครื่องดื่ม</span>
+      </div>
+      <div class="prod-grid" id="wiz-prod-grid"></div>
+    </div>
+
+    <!-- STEP 2: เลือกแป้ง -->
+    <div id="wiz-step-2" class="wiz-panel" style="display:none">
+      <div class="wiz-panel-title">🫓 เลือกแป้ง</div>
+      <div class="wiz-selected-product" id="wiz-sel-product"></div>
+      <div id="wiz-dough-list"></div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="posWizardNext()">
+        ถัดไป → เลือกหน้า <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- STEP 3: เลือกหน้า -->
+    <div id="wiz-step-3" class="wiz-panel" style="display:none">
+      <div class="wiz-panel-title">🍖 เลือกหน้า <span style="font-size:12px;font-weight:600;color:var(--muted)">(เลือกได้หลายอย่าง)</span></div>
+      <div id="wiz-topping-list"></div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="posWizardNext()">
+        ถัดไป → เลือกท็อปปิ้ง <i class="ti ti-arrow-right"></i>
+      </button>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="posWizardNext()">ข้าม (ไม่เลือกหน้า)</button>
+    </div>
+
+    <!-- STEP 4: เลือกท็อปปิ้ง -->
+    <div id="wiz-step-4" class="wiz-panel" style="display:none">
+      <div class="wiz-panel-title">🧀 ท็อปปิ้ง <span style="font-size:12px;font-weight:600;color:var(--muted)">(เลือกได้หลายอย่าง)</span></div>
+      <div id="wiz-extra-list"></div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="posWizardNext()">
+        ถัดไป → กำหนดจำนวน <i class="ti ti-arrow-right"></i>
+      </button>
+      <button class="btn btn-secondary" style="margin-top:8px" onclick="posWizardNext()">ข้าม (ไม่เพิ่มท็อปปิ้ง)</button>
+    </div>
+
+    <!-- STEP 5: จำนวน + ยืนยัน -->
+    <div id="wiz-step-5" class="wiz-panel" style="display:none">
+      <div class="wiz-panel-title">✅ ยืนยันและกำหนดจำนวน</div>
+
+      <!-- summary card -->
+      <div style="background:var(--orange-lt);border:1.5px solid rgba(255,107,53,.2);border-radius:14px;padding:14px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div id="wiz-confirm-emoji" style="font-size:36px;line-height:1"></div>
+          <div>
+            <div id="wiz-confirm-name" style="font-size:16px;font-weight:900;color:var(--brown)"></div>
+            <div id="wiz-confirm-dough" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+          </div>
+        </div>
+        <div id="wiz-confirm-opts" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px"></div>
+        <div style="height:1px;background:rgba(255,107,53,.15);margin-bottom:10px"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="stepper" style="border-color:rgba(255,107,53,.3)">
+            <button onclick="wizChangeQty(-1)">−</button>
+            <span id="wiz-qty">1</span>
+            <button onclick="wizChangeQty(1)">+</button>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:10px;color:var(--muted);font-weight:700">ราคารวม</div>
+            <div id="wiz-confirm-price" style="font-size:26px;font-weight:900;color:var(--orange)">฿0</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="wizAddToOrder()" style="background:var(--green);box-shadow:0 4px 14px rgba(34,197,94,.35)">
+        <i class="ti ti-circle-check"></i> เพิ่มเข้าออเดอร์
+      </button>
+      <button class="btn" onclick="wizAddAndContinue()" style="margin-top:8px;background:var(--orange-lt);color:var(--orange);border:1.5px solid rgba(255,107,53,.2);width:100%;font-weight:800">
+        <i class="ti ti-plus"></i> เพิ่มเข้าออเดอร์ + สั่งเครปชิ้นถัดไป
+      </button>
+    </div>
+
+  </div><!-- end wizard -->
+</div>
+
+<!-- ========== PAGE: MENU MANAGEMENT ========== -->
+<div class="page" id="page-menu">
+  <div class="sec-header">
+    <div class="sec-title">จัดการหน้า/ท็อปปิ้ง</div>
+    <button class="btn btn-sm btn-primary" onclick="openMenuModal()">+ เพิ่ม</button>
+  </div>
+
+  <!-- Tabs: แป้ง / หน้า / ท็อปปิ้ง / เมนูหลัก -->
+  <div class="scroll-tabs" id="menu-type-tabs">
+    <span class="chip active" onclick="setMenuTab('base',this)">🥞 แป้งเครป</span>
+    <span class="chip" onclick="setMenuTab('topping',this)">🍖 หน้าเครป</span>
+    <span class="chip" onclick="setMenuTab('extra',this)">🧀 ท็อปปิ้ง</span>
+    <span class="chip" onclick="setMenuTab('product',this)">📋 เมนูหลัก</span>
+  </div>
+
+  <div id="menu-list"></div>
+</div>
+
+<!-- ========== PAGE: STOCK ========== -->
+<div class="page" id="page-stock">
+  <div class="sec-header">
+    <div class="sec-title">วัตถุดิบ</div>
+    <div style="display:flex;gap:7px">
+      <button class="cal-toggle-btn" onclick="calToggle('stock')"><i class="ti ti-calendar"></i></button>
+      <button class="btn btn-sm btn-primary" onclick="openMatModal()">+ เพิ่ม</button>
+    </div>
+  </div>
+  <div class="cal-wrap" id="cal-stock-wrap" style="display:none">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calMove('stock',-1)">‹</button>
+      <div class="cal-title" id="cal-stock-title"></div>
+      <button class="cal-nav" onclick="calMove('stock',1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-stock-grid"></div>
+    <div class="cal-range-bar" id="cal-stock-bar" style="display:none">
+      <span id="cal-stock-range-txt"></span>
+      <button class="cal-range-clear" onclick="calClear('stock')">✕ ล้าง</button>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--orange-dk)"><span id="cal-stock-hint">กดวันเริ่มต้น</span></div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card" style="--accent:var(--brown)">
+      <div class="stat-lbl">รายการทั้งหมด</div>
+      <div class="stat-val" id="sk-count">0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--gold)">
+      <div class="stat-lbl">มูลค่า Stock</div>
+      <div class="stat-val" id="sk-val">฿0</div>
+    </div>
+  </div>
+  <div id="stock-list"></div>
+</div>
+
+<!-- ========== PAGE: HISTORY ========== -->
+<div class="page" id="page-history">
+  <div class="sec-header">
+    <div class="sec-title">ประวัติการขาย</div>
+    <div style="font-size:12px;color:var(--muted)" id="hist-count"></div>
+  </div>
+  <div class="search-wrap">
+    <i class="ti ti-search"></i>
+    <input type="text" placeholder="ค้นหาออเดอร์..." id="hist-search" oninput="renderHistory()">
+  </div>
+  <div class="scroll-tabs" id="hist-filter-tabs">
+    <span class="chip active" onclick="setHistFilter('all',this)">ทั้งหมด</span>
+    <span class="chip" onclick="setHistFilter('today',this)">วันนี้</span>
+    <span class="chip" onclick="setHistFilter('week',this)">สัปดาห์นี้</span>
+    <span class="chip" onclick="setHistFilter('month',this)">เดือนนี้</span>
+  </div>
+  <div id="history-list"></div>
+</div>
+
+<!-- ========== PAGE: REPORT ========== -->
+<div class="page" id="page-report">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sec-title">รายงาน</div>
+    <button class="cal-toggle-btn" onclick="calToggle('report')"><i class="ti ti-calendar"></i> ปฏิทิน</button>
+  </div>
+  <div class="cal-wrap" id="cal-report-wrap" style="display:none">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calMove('report',-1)">‹</button>
+      <div class="cal-title" id="cal-report-title"></div>
+      <button class="cal-nav" onclick="calMove('report',1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-report-grid"></div>
+    <div class="cal-range-bar" id="cal-report-bar" style="display:none">
+      <span id="cal-report-range-txt"></span>
+      <button class="cal-range-clear" onclick="calClear('report')">✕ ล้าง</button>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:10px">
+      <span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:var(--orange);display:inline-block"></span>มียอดขาย</span>
+      <span id="cal-report-hint" style="color:var(--orange-dk)">กดวันเริ่มต้น</span>
+    </div>
+  </div>
+  <div class="scroll-tabs" id="report-period-tabs">
+    <span class="chip active" onclick="setReportPeriod('today',this)">วันนี้</span>
+    <span class="chip" onclick="setReportPeriod('week',this)">สัปดาห์</span>
+    <span class="chip" onclick="setReportPeriod('month',this)">เดือนนี้</span>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-card" style="--accent:var(--orange)">
+      <div class="stat-lbl">รายได้</div>
+      <div class="stat-val" id="r-revenue">฿0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--green)">
+      <div class="stat-lbl">กำไร</div>
+      <div class="stat-val" id="r-profit">฿0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--gold)">
+      <div class="stat-lbl">ออเดอร์</div>
+      <div class="stat-val" id="r-orders">0</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--blue)">
+      <div class="stat-lbl">ชิ้นที่ขาย</div>
+      <div class="stat-val" id="r-pieces">0</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 หน้า/ท็อปปิ้งขายดี</div>
+    <div id="r-top-chart"></div>
+  </div>
+  <div class="card mt">
+    <div class="card-title">💸 ต้นทุน vs รายได้</div>
+    <div id="r-cost-chart"></div>
+  </div>
+  <div class="card mt">
+    <div class="card-title">📦 วัตถุดิบใช้มาก</div>
+    <div id="r-material-chart"></div>
+  </div>
+</div>
+
+<!-- ========== PAGE: SETTINGS ========== -->
+<div class="page" id="page-settings">
+  <div class="sec-title" style="margin-bottom:14px">⚙️ ตั้งค่า</div>
+  <div class="card">
+    <div class="card-title">ข้อมูลร้าน</div>
+    <div class="field"><label>ชื่อร้าน</label><input id="cfg-name" placeholder="เครปโปร"></div>
+    <div class="field"><label>ที่อยู่</label><input id="cfg-addr" placeholder="กรุงเทพฯ"></div>
+    <div class="field"><label>เบอร์โทร</label><input id="cfg-phone" type="tel" placeholder="08x-xxx-xxxx"></div>
+    <button class="btn btn-primary" onclick="saveConfig()">บันทึก</button>
+  </div>
+  <div class="card mt">
+    <div class="card-title">QR พร้อมเพย์</div>
+    <div class="field"><label>หมายเลขพร้อมเพย์</label><input id="cfg-promptpay" placeholder="0812345678"></div>
+    <button class="btn btn-primary" onclick="saveConfig()">บันทึก</button>
+  </div>
+  <div class="card mt">
+    <div class="card-title">ข้อมูลระบบ</div>
+    <div class="setting-row">
+      <div><div class="setting-label">ออเดอร์ทั้งหมด</div><div class="setting-sub">นับตั้งแต่เริ่มใช้</div></div>
+      <div style="font-weight:800;color:var(--orange)" id="cfg-total-orders">0</div>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">ยอดขายสะสม</div></div>
+      <div style="font-weight:800;color:var(--orange)" id="cfg-total-rev">฿0</div>
+    </div>
+    <button class="btn btn-secondary mt" onclick="clearData()" style="color:var(--red);border-color:var(--red)">🗑️ ล้างข้อมูลทั้งหมด</button>
+  </div>
+</div>
+
+<!-- BOTTOM TAB -->
+<div class="bottom-tab">
+  <button class="tab-btn active" onclick="showPage('dash',this)"><i class="ti ti-layout-dashboard"></i>หน้าหลัก</button>
+  <button class="tab-btn" onclick="showPage('pos',this)"><i class="ti ti-shopping-cart"></i>ขายสินค้า</button>
+  <button class="tab-btn" onclick="showPage('menu',this)"><i class="ti ti-salad"></i>จัดการหน้า</button>
+  <button class="tab-btn" onclick="showPage('stock',this)"><i class="ti ti-package"></i>Stock</button>
+  <button class="tab-btn" onclick="showPage('history',this)"><i class="ti ti-receipt"></i>ประวัติ</button>
+  <button class="tab-btn" onclick="showPage('report',this)"><i class="ti ti-chart-line"></i>รายงาน</button>
+  <button class="tab-btn" onclick="showPage('settings',this)"><i class="ti ti-settings"></i>ตั้งค่า</button>
+</div>
+
+<!-- ============================= MODALS ============================= -->
+
+<!-- MODAL: MENU ITEM (base/topping/extra/product) -->
+<div class="modal-bg" id="modal-menu">
+  <div class="modal">
+    <div class="modal-title" id="mm-modal-title">เพิ่มรายการ</div>
+    <div class="field"><label>ชื่อ</label><input id="mm-name" placeholder="ชีส"></div>
+    <div id="mm-cat-field" class="field"><label>ประเภท</label>
+      <select id="mm-cat">
+        <option value="base">🥞 แป้งเครป</option>
+        <option value="topping">🍖 หน้าเครป</option>
+        <option value="extra">🧀 ท็อปปิ้ง</option>
+        <option value="product">📋 เมนูหลัก</option>
+      </select>
+    </div>
+    <div id="mm-prod-cat-field" class="field" style="display:none"><label>หมวดเมนู</label>
+      <select id="mm-prod-cat">
+        <option value="เครปกรอบ">🥞 เครปกรอบ</option>
+        <option value="เครปนิ่ม">🌯 เครปนิ่ม</option>
+        <option value="เครปหวาน">🍓 เครปหวาน</option>
+        <option value="เครื่องดื่ม">🧋 เครื่องดื่ม</option>
+      </select>
+    </div>
+    <div class="field"><label>ราคา (บาท)</label><input id="mm-price" type="number" min="0" placeholder="0"></div>
+    <div id="mm-cost-field" class="field"><label>ต้นทุน (บาท)</label><input id="mm-cost" type="number" min="0" placeholder="0"></div>
+    <div class="field"><label>Emoji / ไอคอน</label><input id="mm-emoji" placeholder="🧀"></div>
+    <div class="field" style="display:flex;align-items:center;justify-content:space-between">
+      <label style="font-size:11.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">สถานะเปิดขาย</label>
+      <label class="switch"><input type="checkbox" id="mm-active" checked><span class="slider"></span></label>
+    </div>
+    <input type="hidden" id="mm-id">
+    <input type="hidden" id="mm-type">
+    <button class="btn btn-primary" onclick="saveMenuItem()">บันทึก</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal('modal-menu')">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- MODAL: MATERIAL -->
+<div class="modal-bg" id="modal-material">
+  <div class="modal">
+    <div class="modal-title" id="mmat-title">เพิ่มวัตถุดิบ</div>
+    <div class="field"><label>ชื่อวัตถุดิบ</label><input id="mmat-name" placeholder="แป้งสาลี"></div>
+    <div class="field"><label>หน่วย</label><input id="mmat-unit" placeholder="กก. / ถุง / ฟอง"></div>
+    <div class="field"><label>จำนวนปัจจุบัน</label><input id="mmat-qty" type="number" min="0" placeholder="0"></div>
+    <div class="field"><label>แจ้งเตือนเมื่อน้อยกว่า</label><input id="mmat-min" type="number" min="0" placeholder="5"></div>
+    <div class="field"><label>ราคา/หน่วย (บาท)</label><input id="mmat-price" type="number" min="0" placeholder="0"></div>
+    <div class="field"><label>ตำแหน่งเก็บ</label><input id="mmat-loc" placeholder="ตู้เย็น / ชั้น A"></div>
+    <input type="hidden" id="mmat-id">
+    <button class="btn btn-primary" onclick="saveMaterial()">บันทึก</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal('modal-material')">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- MODAL: STOCK ACTION -->
+<div class="modal-bg" id="modal-stock-action">
+  <div class="modal">
+    <div class="modal-title" id="msa-title">รับวัตถุดิบเข้า</div>
+    <div style="font-size:14px;font-weight:700;color:var(--muted);margin-bottom:14px" id="msa-name"></div>
+    <div class="field"><label>ประเภท</label>
+      <select id="msa-type">
+        <option value="in">📥 รับเข้า</option>
+        <option value="out">📤 เบิกออก</option>
+        <option value="adj">🔧 ปรับยอด</option>
+      </select>
+    </div>
+    <div class="field"><label>จำนวน</label><input id="msa-qty" type="number" min="0" placeholder="0"></div>
+    <div class="field"><label>หมายเหตุ</label><input id="msa-note" placeholder="ซื้อจากตลาด..."></div>
+    <input type="hidden" id="msa-id">
+    <button class="btn btn-primary" onclick="doStockAction()">บันทึก</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal('modal-stock-action')">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- MODAL: QR PAYMENT -->
+<div class="modal-bg" id="modal-qr">
+  <div class="modal">
+    <div class="modal-title">💳 QR พร้อมเพย์</div>
+    <div class="field"><label>หมายเลขพร้อมเพย์</label><input id="qr-number" placeholder="0812345678" oninput="genQR()"></div>
+    <div class="field"><label>ยอดชำระ (บาท)</label><input id="qr-amount" type="number" oninput="genQR()"></div>
+    <div style="text-align:center;padding:12px 0">
+      <div id="qr-box" style="background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px;display:inline-block"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">สแกนด้วยแอปธนาคาร</div>
+    </div>
+    <button class="btn btn-primary" onclick="confirmPayment()">✅ ยืนยันรับเงินแล้ว</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal('modal-qr')">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- MODAL: RECEIPT -->
+<div class="modal-bg" id="modal-receipt">
+  <div class="modal">
+    <div style="text-align:center;padding-bottom:16px">
+      <div style="font-size:52px">🎉</div>
+      <div style="font-size:20px;font-weight:900;color:var(--orange);margin-top:6px">ชำระเงินสำเร็จ!</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px" id="rcpt-time"></div>
+    </div>
+    <div class="divider"></div>
+    <div id="rcpt-items"></div>
+    <div class="divider"></div>
+    <div class="receipt-item"><span style="color:var(--muted)">ส่วนลด</span><span id="rcpt-disc" style="color:var(--red)">฿0</span></div>
+    <div class="receipt-total"><span>ยอดรวม</span><span id="rcpt-total"></span></div>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="closeReceipt()">✅ ปิดใบเสร็จ</button>
+  </div>
+</div>
+
+<!-- MODAL: ORDER DETAIL -->
+<div class="modal-bg" id="modal-order-detail">
+  <div class="modal">
+    <div class="modal-title">📋 รายละเอียดออเดอร์</div>
+    <div id="od-content"></div>
+    <button class="btn btn-red" style="margin-top:14px" id="od-cancel-btn">❌ ยกเลิกออเดอร์</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal('modal-order-detail')">ปิด</button>
+  </div>
+</div>
+
+<!-- MODAL: DISCOUNT -->
+<div class="modal-bg" id="modal-discount">
+  <div class="modal">
+    <div class="modal-title">🏷️ ส่วนลด</div>
+    <div class="field"><label>ประเภท</label>
+      <select id="disc-type"><option value="thb">ลดเป็นบาท (฿)</option><option value="pct">ลดเปอร์เซ็นต์ (%)</option></select>
+    </div>
+    <div class="field"><label>จำนวน</label><input id="disc-val" type="number" min="0" placeholder="0"></div>
+    <button class="btn btn-primary" onclick="applyDiscount()">ใช้ส่วนลด</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="closeModal('modal-discount')">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- DRAWER: CART -->
+<div class="drawer-overlay" id="overlay-cart" onclick="closeDrawer('drawer-cart')"></div>
+<div class="drawer" id="drawer-cart">
+  <div class="drawer-handle"></div>
+  <div style="font-size:17px;font-weight:900;margin-bottom:14px;color:var(--brown)">🛒 ตะกร้าสินค้า</div>
+  <div id="cart-list"></div>
+  <div class="divider"></div>
+  <div class="receipt-item">
+    <span style="color:var(--muted)">ยอดรวม</span><span id="c-sub" style="font-weight:800">฿0</span>
+  </div>
+  <div class="receipt-item">
+    <span style="color:var(--muted)">ส่วนลด</span>
+    <span style="display:flex;align-items:center;gap:6px">
+      <span id="c-disc" style="color:var(--red);font-weight:700">฿0</span>
+      <button class="btn btn-sm" style="background:var(--amber-lt);color:var(--amber);border:none" onclick="openModal('modal-discount')">แก้ไข</button>
+    </span>
+  </div>
+  <div class="receipt-total"><span>ยอดสุทธิ</span><span id="c-total">฿0</span></div>
+  <button class="btn btn-primary" style="margin-top:14px" onclick="checkout()">💳 ชำระเงิน</button>
+  <button class="btn btn-secondary" style="margin-top:8px" onclick="closeDrawer('drawer-cart')">ปิด</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== DATA LAYER =====================
+const DB = {
+  g(k){ try{ return JSON.parse(localStorage.getItem('crepe_'+k)||'null') }catch(e){return null} },
+  s(k,v){ localStorage.setItem('crepe_'+k, JSON.stringify(v)) }
+};
+
+// Menu items: base (แป้ง), topping (หน้า), extra (ท็อปปิ้ง), product (เมนูหลัก)
+let menuItems  = DB.g('menuItems')  || defaultMenuItems();
+let materials  = DB.g('materials')  || defaultMaterials();
+let sales      = DB.g('sales')      || [];
+let config     = DB.g('config')     || {name:'เครปโปร', addr:'', phone:'', promptpay:''};
+
+let cart       = []; // [{key, prodId, name, opts, optLabels, qty, unitPrice, cost}]
+let discount   = {type:'thb', val:0};
+let buildState = {prodId:null, qty:1};
+let posFilter  = 'all';
+let menuTab    = 'base';
+let histFilter = 'all';
+let reportPeriod = 'today';
+
+let _mid = Math.max(0,...menuItems.map(m=>m.id))+1;
+let _matid = Math.max(0,...materials.map(m=>m.id))+1;
+let _sid   = Math.max(0,...(sales.length?sales.map(s=>s.id):[0]))+1;
+
+function save(){
+  DB.s('menuItems',menuItems);
+  DB.s('materials',materials);
+  DB.s('sales',sales);
+  DB.s('config',config);
+}
+
+function defaultMenuItems(){
+  return [
+    // แป้ง (base)
+    {id:1,type:'base',name:'แป้งธรรมดา',price:0,cost:0,emoji:'🥞',active:true,cat:''},
+    {id:2,type:'base',name:'แป้งช็อกโกแลต',price:10,cost:4,emoji:'🍫',active:true,cat:''},
+    {id:3,type:'base',name:'แป้งชาเขียว',price:15,cost:5,emoji:'🍵',active:true,cat:''},
+    {id:4,type:'base',name:'แป้งสตรอว์เบอร์รี',price:10,cost:4,emoji:'🍓',active:true,cat:''},
+    // หน้า (topping)
+    {id:5,type:'topping',name:'ไส้กรอก',price:20,cost:8,emoji:'🌭',active:true,cat:''},
+    {id:6,type:'topping',name:'ปูอัด',price:15,cost:5,emoji:'🦀',active:true,cat:''},
+    {id:7,type:'topping',name:'แฮม',price:15,cost:6,emoji:'🥩',active:true,cat:''},
+    {id:8,type:'topping',name:'ไข่ดาว',price:10,cost:3,emoji:'🍳',active:true,cat:''},
+    {id:9,type:'topping',name:'ทูน่า',price:20,cost:7,emoji:'🐟',active:true,cat:''},
+    // ท็อปปิ้ง (extra)
+    {id:10,type:'extra',name:'ชีส',price:10,cost:4,emoji:'🧀',active:true,cat:''},
+    {id:11,type:'extra',name:'มายองเนส',price:5,cost:1,emoji:'🥄',active:true,cat:''},
+    {id:12,type:'extra',name:'ซอสพิเศษ',price:5,cost:1,emoji:'🥫',active:true,cat:''},
+    {id:13,type:'extra',name:'หัวหอมทอด',price:5,cost:2,emoji:'🧅',active:true,cat:''},
+    // เมนูหลัก (product)
+    {id:14,type:'product',name:'เครปกรอบ',price:35,cost:12,emoji:'🥞',active:true,cat:'เครปกรอบ'},
+    {id:15,type:'product',name:'เครปนิ่ม',price:30,cost:10,emoji:'🌯',active:true,cat:'เครปนิ่ม'},
+    {id:16,type:'product',name:'เครปหวานนูเทลล่า',price:45,cost:15,emoji:'🍫',active:true,cat:'เครปหวาน'},
+    {id:17,type:'product',name:'เครปหวานสตรอว์เบอร์รี',price:40,cost:13,emoji:'🍓',active:true,cat:'เครปหวาน'},
+    {id:18,type:'product',name:'ชาไทยเย็น',price:45,cost:15,emoji:'🧋',active:true,cat:'เครื่องดื่ม'},
+    {id:19,type:'product',name:'น้ำส้มคั้น',price:40,cost:12,emoji:'🍊',active:true,cat:'เครื่องดื่ม'},
+  ];
+}
+
+function defaultMaterials(){
+  return [
+    {id:1,name:'แป้งสาลี',unit:'กก.',qty:15,min:3,price:35,loc:'ชั้น A',log:[]},
+    {id:2,name:'ชีส',unit:'ถุง',qty:20,min:5,price:65,loc:'ตู้เย็น',log:[]},
+    {id:3,name:'ไข่ไก่',unit:'ฟอง',qty:60,min:24,price:5,loc:'ตู้เย็น',log:[]},
+    {id:4,name:'นมสด',unit:'ลิตร',qty:8,min:2,price:45,loc:'ตู้เย็น',log:[]},
+    {id:5,name:'เนยสด',unit:'กก.',qty:3,min:1,price:180,loc:'ตู้เย็น',log:[]},
+    {id:6,name:'ไส้กรอก',unit:'ชิ้น',qty:40,min:10,price:8,loc:'ตู้เย็น',log:[]},
+    {id:7,name:'ปูอัด',unit:'ชิ้น',qty:30,min:8,price:6,loc:'ตู้เย็น',log:[]},
+    {id:8,name:'ถุงบรรจุ',unit:'ใบ',qty:100,min:20,price:3,loc:'ชั้น B',log:[]},
+  ];
+}
+
+// ===================== UTILS =====================
+const fmt = n => '฿'+Number(n||0).toLocaleString('th');
+const today = () => new Date().toISOString().slice(0,10);
+const thisMonth = () => new Date().toISOString().slice(0,7);
+const thisWeekStart = () => { const d=new Date(); d.setDate(d.getDate()-d.getDay()); return d.toISOString().slice(0,10); };
+const fmtDate = d => { try{ return new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) }catch(e){return d} };
+const fmtTime = () => new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+const fmtDateTime = d => { try{ const dt=new Date(d); return dt.toLocaleDateString('th-TH',{day:'numeric',month:'short'})+' '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}) }catch(e){return d} };
+const toast = msg => { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); };
+
+function openModal(id){ document.getElementById(id).classList.add('open') }
+function closeModal(id){ document.getElementById(id).classList.remove('open') }
+function openDrawer(id){ document.getElementById(id).classList.add('open'); document.getElementById('overlay-'+id.split('-').slice(1).join('-')).classList.add('open'); renderCartDrawer(); }
+function closeDrawer(id){ document.getElementById(id).classList.remove('open'); const ov=document.getElementById('overlay-'+id.split('-').slice(1).join('-')); if(ov) ov.classList.remove('open'); }
+
+// ===================== NAV =====================
+function showPage(p, btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  btn.classList.add('active');
+  if(p==='dash') renderDash();
+  if(p==='pos') { initPOS(); }
+  if(p==='menu') renderMenuList();
+  if(p==='stock') renderStock();
+  if(p==='history') renderHistory();
+  if(p==='report') renderReport();
+  if(p==='settings') renderSettings();
+}
+
+// ===================== DASHBOARD =====================
+function renderDash(){
+  const td = today(), tm = thisMonth();
+  const todaySales = sales.filter(s=>s.date===td);
+  const monthSales = sales.filter(s=>s.date&&s.date.startsWith(tm));
+  document.getElementById('d-sales').textContent  = fmt(todaySales.reduce((s,x)=>s+x.total,0));
+  document.getElementById('d-profit').textContent = fmt(todaySales.reduce((s,x)=>s+x.profit,0));
+  document.getElementById('d-orders').textContent = todaySales.length;
+  document.getElementById('d-month').textContent  = fmt(monthSales.reduce((s,x)=>s+x.total,0));
+
+  // top items today
+  const optMap = {};
+  todaySales.forEach(s=>(s.items||[]).forEach(i=>(i.opts||[]).forEach(o=>{optMap[o.name]=(optMap[o.name]||0)+i.qty})));
+  const sorted = Object.entries(optMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const ti = document.getElementById('d-top-items');
+  if(!sorted.length){ ti.innerHTML='<div class="empty-state" style="padding:12px 0"><i class="ti ti-chart-bar"></i><p>ยังไม่มีข้อมูล</p></div>'; }
+  else { const mx=sorted[0][1]; ti.innerHTML=sorted.map(([n,q])=>`<div class="bar-item"><div class="bar-meta"><span>${n}</span><span style="color:var(--orange)">${q}×</span></div><div class="bar-track"><div class="bar-fill" style="width:${(q/mx*100).toFixed(0)}%"></div></div></div>`).join(''); }
+
+  // low stock
+  const low = materials.filter(m=>m.qty<=m.min);
+  const ls = document.getElementById('d-low-stock');
+  if(!low.length){ ls.innerHTML='<div style="color:var(--green);text-align:center;font-size:13px;padding:8px 0;font-weight:700">✅ สต็อกปกติ</div>'; }
+  else { ls.innerHTML=low.map(m=>`<div class="row-item"><div class="row-icon" style="background:var(--red-lt);color:var(--red)"><i class="ti ti-alert-triangle"></i></div><div class="row-info"><div class="row-title">${m.name}</div><div class="row-sub">เหลือ ${m.qty} ${m.unit}</div></div><span class="badge badge-red">ใกล้หมด</span></div>`).join(''); }
+
+  // recent orders
+  const recent = [...sales].reverse().slice(0,4);
+  const ro = document.getElementById('d-recent-orders');
+  if(!recent.length){ ro.innerHTML='<div class="empty-state" style="padding:12px 0"><i class="ti ti-receipt"></i><p>ยังไม่มีออเดอร์</p></div>'; }
+  else { ro.innerHTML=recent.map(s=>`<div class="row-item"><div class="row-icon" style="background:var(--orange-lt);color:var(--orange)"><i class="ti ti-receipt"></i></div><div class="row-info"><div class="row-title">${(s.items||[]).map(i=>i.name).join(', ')}</div><div class="row-sub">${fmtDateTime(s.date+' '+s.time)}</div></div><div class="row-right" style="font-weight:900;color:var(--orange)">${fmt(s.total)}</div></div>`).join(''); }
+}
+
+// ===================== POS — WIZARD FLOW =====================
+let wizCat = 'all';
+let wizStep = 1; // 1=เมนู 2=แป้ง 3=หน้า 4=ท็อปปิ้ง 5=ยืนยัน
+let wizBuild = { prodId:null, doughId:null, toppingIds:[], extraIds:[], qty:1 };
+
+// open POS → always show summary view
+function initPOS(){
+  wizCat='all';
+  showPOSSummary();
+  renderPOSSummary();
+  pollCustomerOrders();
+}
+
+function showPOSSummary(){
+  document.getElementById('pos-view-summary').style.display='block';
+  document.getElementById('pos-view-wizard').style.display='none';
+}
+
+function showPOSWizard(){
+  document.getElementById('pos-view-summary').style.display='none';
+  document.getElementById('pos-view-wizard').style.display='block';
+}
+
+function posStartBuild(){
+  wizBuild = { prodId:null, doughId:null, toppingIds:[], extraIds:[], qty:1 };
+  wizStep=1;
+  showPOSWizard();
+  renderWizStep();
+}
+
+function posWizardBack(){
+  if(wizStep===1){ posWizardCancel(); return; }
+  // skip back over irrelevant steps
+  wizStep--;
+  if(wizStep===2){
+    const p = menuItems.find(m=>m.id===wizBuild.prodId);
+    const isSweet = p&&p.cat==='เครปหวาน', isDrink = p&&p.cat==='เครื่องดื่ม';
+    if(isSweet||isDrink) wizStep=1;
+  }
+  if(wizStep===3){
+    const p = menuItems.find(m=>m.id===wizBuild.prodId);
+    const isSweet = p&&p.cat==='เครปหวาน', isDrink = p&&p.cat==='เครื่องดื่ม';
+    if(isSweet||isDrink) wizStep=1;
+  }
+  renderWizStep();
+}
+
+function posWizardNext(){
+  const p = menuItems.find(m=>m.id===wizBuild.prodId);
+  const isSweet = p&&p.cat==='เครปหวาน', isDrink = p&&p.cat==='เครื่องดื่ม';
+  wizStep++;
+  // skip dough/topping/extra for sweet/drink
+  if((isSweet||isDrink) && wizStep===2) wizStep=5;
+  if((isSweet||isDrink) && wizStep===3) wizStep=5;
+  if((isSweet||isDrink) && wizStep===4) wizStep=5;
+  renderWizStep();
+}
+
+function posWizardCancel(){
+  showPOSSummary();
+  renderPOSSummary();
+}
+
+function setWizCat(c,el){
+  wizCat=c;
+  document.querySelectorAll('#wiz-cat-tabs .chip').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderWizProdGrid();
+}
+
+function renderWizStep(){
+  // update dots
+  [1,2,3,4,5].forEach(n=>{
+    const dot = document.getElementById('dot-'+(n-1));
+    dot.className='wiz-dot';
+    dot.textContent=n;
+    if(n<wizStep){ dot.classList.add('done'); dot.textContent='✓'; }
+    else if(n===wizStep) dot.classList.add('active');
+  });
+  [0,1,2,3].forEach(n=>{
+    const line = document.querySelectorAll('.wiz-line')[n];
+    if(line) line.className='wiz-line'+(n<wizStep-1?' done':'');
+  });
+
+  // step labels
+  const labels = ['เลือกเมนู','เลือกแป้ง','เลือกหน้า','เลือกท็อปปิ้ง','กำหนดจำนวน'];
+  document.getElementById('wiz-step-label').textContent = `ขั้นที่ ${wizStep} / ${labels[wizStep-1]}`;
+
+  // show correct panel
+  [1,2,3,4,5].forEach(n=>{
+    document.getElementById('wiz-step-'+n).style.display = n===wizStep?'block':'none';
+  });
+
+  if(wizStep===1) renderWizProdGrid();
+  if(wizStep===2) renderWizDough();
+  if(wizStep===3) renderWizTopping();
+  if(wizStep===4) renderWizExtra();
+  if(wizStep===5) renderWizConfirm();
+}
+
+// Step 1: เมนูหลัก
+function renderWizProdGrid(){
+  const prods = menuItems.filter(m=>m.type==='product'&&m.active&&(wizCat==='all'||m.cat===wizCat));
+  const grid = document.getElementById('wiz-prod-grid');
+  if(!prods.length){ grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-mood-empty"></i><p>ไม่มีสินค้า</p></div>'; return; }
+  grid.innerHTML = prods.map(p=>`
+    <div class="prod-card ${wizBuild.prodId===p.id?'wiz-selected-prod':''}" onclick="wizSelectProduct(${p.id})" style="${wizBuild.prodId===p.id?'border-color:var(--orange);background:var(--orange-lt)':''}">
+      <div class="prod-emoji">${p.emoji||'🥞'}</div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-price">${fmt(p.price)}</div>
+      <div class="prod-sub">${p.cat}</div>
+    </div>`).join('');
+}
+
+function wizSelectProduct(id){
+  wizBuild.prodId=id;
+  wizBuild.doughId=null;
+  wizBuild.toppingIds=[];
+  wizBuild.extraIds=[];
+  wizBuild.qty=1;
+  posWizardNext();
+}
+
+// Step 2: แป้ง
+function renderWizDough(){
+  const p = menuItems.find(m=>m.id===wizBuild.prodId);
+  document.getElementById('wiz-sel-product').innerHTML = p?`
+    <span style="font-size:28px">${p.emoji||'🥞'}</span>
+    <div>
+      <div style="font-size:14px;font-weight:800">${p.name}</div>
+      <div style="font-size:12px;color:var(--muted)">${p.cat} · ${fmt(p.price)}</div>
+    </div>`:'';
+
+  const bases = menuItems.filter(m=>m.type==='base'&&m.active);
+  // auto-select first if none chosen
+  if(!wizBuild.doughId && bases.length) wizBuild.doughId=bases[0].id;
+
+  document.getElementById('wiz-dough-list').innerHTML = bases.map(o=>`
+    <div class="wiz-radio-row ${wizBuild.doughId===o.id?'selected':''}" onclick="wizSelectDough(${o.id})">
+      <span class="wiz-opt-emoji">${o.emoji||'🥞'}</span>
+      <div class="wiz-radio-dot"></div>
+      <span class="wiz-opt-name">${o.name}</span>
+      <span class="wiz-opt-price ${o.price===0?'free':''}">${o.price===0?'ฟรี':'+'+fmt(o.price)}</span>
+    </div>`).join('');
+}
+
+function wizSelectDough(id){
+  wizBuild.doughId=id;
+  renderWizDough();
+}
+
+// Step 3: หน้า (multi)
+function renderWizTopping(){
+  const tops = menuItems.filter(m=>m.type==='topping'&&m.active);
+  document.getElementById('wiz-topping-list').innerHTML = tops.map(o=>{
+    const sel = wizBuild.toppingIds.includes(o.id);
+    return `<div class="wiz-opt-row ${sel?'selected':''}" onclick="wizToggleTopping(${o.id})">
+      <span class="wiz-opt-emoji">${o.emoji||'🍖'}</span>
+      <div class="wiz-opt-check">${sel?'✓':''}</div>
+      <span class="wiz-opt-name">${o.name}</span>
+      <span class="wiz-opt-price">+${fmt(o.price)}</span>
+    </div>`;
+  }).join('');
+}
+
+function wizToggleTopping(id){
+  const i=wizBuild.toppingIds.indexOf(id);
+  if(i>=0) wizBuild.toppingIds.splice(i,1); else wizBuild.toppingIds.push(id);
+  renderWizTopping();
+}
+
+// Step 4: ท็อปปิ้ง (multi)
+function renderWizExtra(){
+  const extras = menuItems.filter(m=>m.type==='extra'&&m.active);
+  document.getElementById('wiz-extra-list').innerHTML = extras.map(o=>{
+    const sel = wizBuild.extraIds.includes(o.id);
+    return `<div class="wiz-opt-row ${sel?'selected':''}" onclick="wizToggleExtra(${o.id})">
+      <span class="wiz-opt-emoji">${o.emoji||'🧀'}</span>
+      <div class="wiz-opt-check">${sel?'✓':''}</div>
+      <span class="wiz-opt-name">${o.name}</span>
+      <span class="wiz-opt-price">+${fmt(o.price)}</span>
+    </div>`;
+  }).join('');
+}
+
+function wizToggleExtra(id){
+  const i=wizBuild.extraIds.indexOf(id);
+  if(i>=0) wizBuild.extraIds.splice(i,1); else wizBuild.extraIds.push(id);
+  renderWizExtra();
+}
+
+// Step 5: ยืนยัน
+function calcWizUnitPrice(){
+  const p = menuItems.find(m=>m.id===wizBuild.prodId); if(!p) return 0;
+  let total = p.price;
+  if(wizBuild.doughId){ const o=menuItems.find(m=>m.id===wizBuild.doughId); if(o) total+=o.price; }
+  wizBuild.toppingIds.forEach(id=>{ const o=menuItems.find(m=>m.id===id); if(o) total+=o.price; });
+  wizBuild.extraIds.forEach(id=>{ const o=menuItems.find(m=>m.id===id); if(o) total+=o.price; });
+  return total;
+}
+
+function renderWizConfirm(){
+  const p = menuItems.find(m=>m.id===wizBuild.prodId);
+  if(!p) return;
+  document.getElementById('wiz-confirm-emoji').textContent = p.emoji||'🥞';
+  document.getElementById('wiz-confirm-name').textContent = p.name;
+
+  const dough = wizBuild.doughId ? menuItems.find(m=>m.id===wizBuild.doughId) : null;
+  document.getElementById('wiz-confirm-dough').textContent = dough ? `แป้ง: ${dough.name}` : '';
+
+  const allOpts = [
+    ...wizBuild.toppingIds.map(id=>menuItems.find(m=>m.id===id)).filter(Boolean),
+    ...wizBuild.extraIds.map(id=>menuItems.find(m=>m.id===id)).filter(Boolean)
+  ];
+  const optsEl = document.getElementById('wiz-confirm-opts');
+  optsEl.innerHTML = allOpts.length ? allOpts.map(o=>`
+    <span style="background:#fff;border:1.5px solid rgba(255,107,53,.25);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:var(--orange-dk)">${o.emoji||''} ${o.name}</span>`).join('') :
+    '<span style="font-size:12px;color:var(--muted)">ไม่มีหน้า/ท็อปปิ้ง</span>';
+
+  document.getElementById('wiz-qty').textContent = wizBuild.qty;
+  document.getElementById('wiz-confirm-price').textContent = fmt(calcWizUnitPrice()*wizBuild.qty);
+}
+
+function wizChangeQty(d){
+  wizBuild.qty = Math.max(1, wizBuild.qty+d);
+  document.getElementById('wiz-qty').textContent = wizBuild.qty;
+  document.getElementById('wiz-confirm-price').textContent = fmt(calcWizUnitPrice()*wizBuild.qty);
+}
+
+function wizBuildCartItem(){
+  const p = menuItems.find(m=>m.id===wizBuild.prodId); if(!p) return null;
+  const unitPrice = calcWizUnitPrice();
+  const dough = wizBuild.doughId ? menuItems.find(m=>m.id===wizBuild.doughId) : null;
+  const tops = wizBuild.toppingIds.map(id=>menuItems.find(m=>m.id===id)).filter(Boolean);
+  const exts = wizBuild.extraIds.map(id=>menuItems.find(m=>m.id===id)).filter(Boolean);
+  const opts = [...tops,...exts].map(o=>({name:o.name,price:o.price}));
+  const optLabels = [dough&&dough.price>0?dough.name:dough?dough.name:null,...tops.map(o=>o.name),...exts.map(o=>o.name)].filter(Boolean);
+  const cost = p.cost + (dough?dough.cost:0) + tops.reduce((s,o)=>s+o.cost,0) + exts.reduce((s,o)=>s+o.cost,0);
+  const optKey = [wizBuild.doughId||'d0',...wizBuild.toppingIds,...wizBuild.extraIds].join('-');
+  const cartKey = `${p.id}_${optKey}`;
+  return {key:cartKey, prodId:p.id, name:p.name, dough:dough?dough.name:'', opts, optLabels, qty:wizBuild.qty, unitPrice, cost};
+}
+
+function wizAddToOrder(){
+  const item = wizBuildCartItem(); if(!item) return;
+  const existing = cart.find(c=>c.key===item.key);
+  if(existing){ existing.qty+=item.qty; }
+  else { cart.push(item); }
+  toast(`✅ เพิ่ม ${item.name} ×${item.qty}`);
+  showPOSSummary();
+  renderPOSSummary();
+}
+
+function wizAddAndContinue(){
+  const item = wizBuildCartItem(); if(!item) return;
+  const existing = cart.find(c=>c.key===item.key);
+  if(existing){ existing.qty+=item.qty; }
+  else { cart.push(item); }
+  toast(`✅ เพิ่ม ${item.name} ×${item.qty} · เพิ่มเครปชิ้นถัดไป`);
+  // reset and go back to step 1
+  wizBuild = { prodId:null, doughId:null, toppingIds:[], extraIds:[], qty:1 };
+  wizStep=1;
+  renderWizStep();
+}
+
+// ===================== POS SUMMARY VIEW =====================
+function renderPOSSummary(){
+  const count = cart.reduce((s,c)=>s+c.qty,0);
+  const total = cart.reduce((s,c)=>s+c.unitPrice*c.qty,0);
+  document.getElementById('pos-order-count').textContent = count+' ชิ้น';
+  document.getElementById('pos-order-total').textContent = fmt(total);
+
+  const el = document.getElementById('pos-order-items');
+  if(!cart.length){
+    el.innerHTML=`<div class="pos-empty-order"><i class="ti ti-shopping-bag"></i><p>ยังไม่มีรายการ<br>กด "เพิ่มเครปชิ้นใหม่" เพื่อเริ่มออเดอร์</p></div>`;
+  } else {
+    el.innerHTML = cart.map((c,i)=>{
+      const p = menuItems.find(m=>m.id===c.prodId);
+      return `<div class="pos-order-item">
+        <div style="font-size:26px;flex-shrink:0">${p?p.emoji:'🥞'}</div>
+        <div class="pos-order-item-info">
+          <div class="pos-order-item-name">${c.name}</div>
+          ${c.optLabels&&c.optLabels.length?`<div class="pos-order-item-opts">${c.optLabels.join(' · ')}</div>`:''}
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <button style="width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:15px;font-weight:900;color:var(--orange);cursor:pointer" onclick="posItemAdj(${i},-1)">−</button>
+            <span style="font-size:14px;font-weight:800;min-width:20px;text-align:center">${c.qty}</span>
+            <button style="width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:15px;font-weight:900;color:var(--orange);cursor:pointer" onclick="posItemAdj(${i},+1)">+</button>
+            <span style="font-size:12px;color:var(--muted);font-weight:600">${fmt(c.unitPrice)} / ชิ้น</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="pos-order-item-price">${fmt(c.unitPrice*c.qty)}</div>
+          <button onclick="posItemRemove(${i})" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;margin-top:4px">ลบ ✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // discount line
+  const sub = cart.reduce((s,c)=>s+c.unitPrice*c.qty,0);
+  const disc = calcDisc(sub);
+  if(disc>0){
+    el.innerHTML += `<div style="background:var(--amber-lt);border-radius:10px;padding:8px 12px;margin-top:4px;display:flex;justify-content:space-between;font-size:13px;font-weight:700">
+      <span style="color:var(--amber)">🏷️ ส่วนลด</span>
+      <span style="color:var(--red)">-${fmt(disc)}</span>
+    </div>`;
+  }
+
+  const btn = document.getElementById('pos-checkout-btn');
+  btn.disabled = !cart.length;
+  btn.style.opacity = cart.length ? '1' : '.4';
+}
+
+function posItemAdj(i, d){
+  cart[i].qty += d;
+  if(cart[i].qty<=0) cart.splice(i,1);
+  renderPOSSummary();
+}
+
+function posItemRemove(i){
+  cart.splice(i,1);
+  renderPOSSummary();
+}
+
+function posCheckout(){
+  if(!cart.length){ toast('⚠️ ยังไม่มีสินค้า'); return; }
+  const sub = cart.reduce((s,c)=>s+c.unitPrice*c.qty,0);
+  const disc = calcDisc(sub);
+  document.getElementById('qr-amount').value = Math.max(0,sub-disc);
+  document.getElementById('qr-number').value = config.promptpay||'';
+  genQR();
+  openModal('modal-qr');
+}
+
+// ===================== POS (legacy wrappers kept for NAV) =====================
+function renderPOSGrid(){ /* replaced by wizard */ }
+function setPOSCat(){ /* no-op */ }
+function updateCartFab(){ /* no-op */ }
+
+function renderCartDrawer(){
+  // cart drawer now mirrors the summary view
+  const el = document.getElementById('cart-list');
+  if(!cart.length){ el.innerHTML='<div class="empty-state" style="padding:20px 0"><i class="ti ti-shopping-cart"></i><p>ตะกร้าว่าง</p></div>'; }
+  else {
+    el.innerHTML = cart.map((c,i)=>`
+      <div class="row-item">
+        <div class="row-icon" style="background:var(--orange-lt);font-size:22px">${(menuItems.find(m=>m.id===c.prodId)||{}).emoji||'🥞'}</div>
+        <div class="row-info">
+          <div class="row-title">${c.name}</div>
+          ${c.optLabels&&c.optLabels.length?`<div class="row-sub">${c.optLabels.join(' · ')}</div>`:''}
+          <div class="row-sub">${fmt(c.unitPrice)} × ${c.qty}</div>
+        </div>
+        <div class="row-right">
+          <div style="font-weight:900">${fmt(c.unitPrice*c.qty)}</div>
+          <div style="display:flex;gap:5px;margin-top:5px">
+            <button style="width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:15px;font-weight:900;color:var(--orange);cursor:pointer" onclick="cartAdj(${i},-1)">−</button>
+            <button style="width:26px;height:26px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:15px;font-weight:900;color:var(--orange);cursor:pointer" onclick="cartAdj(${i},+1)">+</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  const sub = cart.reduce((s,c)=>s+c.unitPrice*c.qty,0);
+  const disc = calcDisc(sub);
+  document.getElementById('c-sub').textContent = fmt(sub);
+  document.getElementById('c-disc').textContent = disc?('-'+fmt(disc)):'฿0';
+  document.getElementById('c-total').textContent = fmt(Math.max(0,sub-disc));
+}
+
+function cartAdj(i, d){
+  cart[i].qty += d;
+  if(cart[i].qty<=0) cart.splice(i,1);
+  renderCartDrawer();
+  renderPOSSummary();
+}
+
+function calcDisc(sub){ if(!discount.val) return 0; return discount.type==='pct'?Math.round(sub*discount.val/100):Math.min(discount.val,sub); }
+
+function applyDiscount(){
+  discount.type=document.getElementById('disc-type').value;
+  discount.val=+document.getElementById('disc-val').value||0;
+  closeModal('modal-discount');
+  renderCartDrawer();
+  renderPOSSummary();
+  toast('✅ ใส่ส่วนลดแล้ว');
+}
+
+function checkout(){
+  if(!cart.length){ toast('⚠️ ยังไม่มีสินค้า'); return; }
+  const sub = cart.reduce((s,c)=>s+c.unitPrice*c.qty,0);
+  const disc = calcDisc(sub);
+  document.getElementById('qr-amount').value = Math.max(0,sub-disc);
+  document.getElementById('qr-number').value = config.promptpay||'';
+  genQR();
+  closeDrawer('drawer-cart');
+  openModal('modal-qr');
+}
+
+function genQR(){
+  const num = (document.getElementById('qr-number').value||'').trim();
+  const amt = +document.getElementById('qr-amount').value||0;
+  const box = document.getElementById('qr-box');
+  if(!num){ box.innerHTML='<div style="padding:20px;font-size:13px;color:var(--muted);text-align:center">กรอกเบอร์พร้อมเพย์</div>'; return; }
+  box.innerHTML=`<img src="https://promptpay.io/${num}/${amt}.png" style="width:190px;height:190px" onerror="this.parentElement.innerHTML='<div style=padding:16px;text-align:center><b>พร้อมเพย์</b><br>${num}<br>${fmt(amt)}</div>'">`;
+}
+
+function confirmPayment(){ closeModal('modal-qr'); completeCheckout(); }
+
+function completeCheckout(){
+  const items = cart.map(c=>{
+    return {
+      prodId:c.prodId, name:c.name, dough:c.dough||'',
+      opts:c.opts||[], optLabels:c.optLabels||[],
+      qty:c.qty, unitPrice:c.unitPrice, sub:c.unitPrice*c.qty, cost:c.cost
+    };
+  });
+  const sub = items.reduce((s,i)=>s+i.sub,0);
+  const disc = calcDisc(sub);
+  const total = Math.max(0,sub-disc);
+  const profit = items.reduce((s,i)=>s+(i.unitPrice-i.cost)*i.qty,0)-disc;
+  const sale = {id:_sid++, date:today(), time:fmtTime(), items, subtotal:sub, discount:disc, total, profit, cancelled:false};
+  sales.push(sale); save();
+  // receipt
+  document.getElementById('rcpt-time').textContent = today()+' '+sale.time;
+  document.getElementById('rcpt-items').innerHTML = items.map(i=>`<div class="receipt-item"><span>${i.name}${i.optLabels.length?' ('+i.optLabels.join(', ')+')':''} ×${i.qty}</span><span>${fmt(i.sub)}</span></div>`).join('');
+  document.getElementById('rcpt-disc').textContent = disc?('-'+fmt(disc)):'฿0';
+  document.getElementById('rcpt-total').textContent = fmt(total);
+  openModal('modal-receipt');
+}
+
+function closeReceipt(){ closeModal('modal-receipt'); cart=[]; discount={type:'thb',val:0}; initPOS(); renderDash(); }
+
+// ===================== MENU MANAGEMENT =====================
+function setMenuTab(t, el){
+  menuTab=t;
+  document.querySelectorAll('#menu-type-tabs .chip').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('mm-cat').value = t;
+  renderMenuList();
+}
+
+function renderMenuList(){
+  const el = document.getElementById('menu-list');
+  const items = menuItems.filter(m=>m.type===menuTab);
+  if(!items.length){ el.innerHTML='<div class="empty-state"><i class="ti ti-mood-empty"></i><p>ยังไม่มีรายการ</p></div>'; return; }
+  el.innerHTML = items.map(m=>`
+    <div class="menu-card">
+      <div class="menu-card-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:28px">${m.emoji||'🥞'}</span>
+          <div>
+            <div style="font-size:15px;font-weight:800">${m.name}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">
+              ราคา ${fmt(m.price)} · ต้นทุน ${fmt(m.cost)}
+              ${m.cat?` · ${m.cat}`:''}
+            </div>
+          </div>
+        </div>
+        <label class="switch"><input type="checkbox" ${m.active?'checked':''} onchange="toggleMenuItem(${m.id},this.checked)"><span class="slider"></span></label>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-sm btn-ghost" onclick="editMenuItem(${m.id})">✏️ แก้ไข</button>
+        <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="deleteMenuItem(${m.id})">🗑️ ลบ</button>
+      </div>
+    </div>`).join('');
+}
+
+function openMenuModal(){
+  document.getElementById('mm-modal-title').textContent='เพิ่มรายการ';
+  document.getElementById('mm-id').value='';
+  document.getElementById('mm-name').value='';
+  document.getElementById('mm-price').value='';
+  document.getElementById('mm-cost').value='';
+  document.getElementById('mm-emoji').value='';
+  document.getElementById('mm-active').checked=true;
+  document.getElementById('mm-cat').value=menuTab;
+  document.getElementById('mm-type').value=menuTab;
+  document.getElementById('mm-prod-cat-field').style.display = menuTab==='product'?'block':'none';
+  openModal('modal-menu');
+}
+
+function editMenuItem(id){
+  const m=menuItems.find(x=>x.id===id);
+  document.getElementById('mm-modal-title').textContent='แก้ไขรายการ';
+  document.getElementById('mm-id').value=m.id;
+  document.getElementById('mm-name').value=m.name;
+  document.getElementById('mm-price').value=m.price;
+  document.getElementById('mm-cost').value=m.cost;
+  document.getElementById('mm-emoji').value=m.emoji||'';
+  document.getElementById('mm-active').checked=m.active;
+  document.getElementById('mm-cat').value=m.type;
+  document.getElementById('mm-type').value=m.type;
+  document.getElementById('mm-prod-cat-field').style.display = m.type==='product'?'block':'none';
+  if(m.cat) document.getElementById('mm-prod-cat').value=m.cat;
+  openModal('modal-menu');
+}
+
+document.getElementById('mm-cat').addEventListener('change', function(){ document.getElementById('mm-prod-cat-field').style.display = this.value==='product'?'block':'none'; });
+
+function saveMenuItem(){
+  const id = document.getElementById('mm-id').value;
+  const name = document.getElementById('mm-name').value.trim();
+  if(!name){ toast('⚠️ กรอกชื่อด้วยนะครับ'); return; }
+  const type = document.getElementById('mm-cat').value;
+  const data = {
+    name, type, price:+document.getElementById('mm-price').value||0,
+    cost:+document.getElementById('mm-cost').value||0,
+    emoji:document.getElementById('mm-emoji').value||'🥞',
+    active:document.getElementById('mm-active').checked,
+    cat: type==='product'?document.getElementById('mm-prod-cat').value:''
+  };
+  if(id){ const m=menuItems.find(x=>x.id==id); Object.assign(m,data); toast('✅ แก้ไขแล้ว'); }
+  else { menuItems.push({id:_mid++,...data}); toast('✅ เพิ่มแล้ว'); }
+  menuTab=type;
+  save(); closeModal('modal-menu'); renderMenuList();
+}
+
+function toggleMenuItem(id, val){
+  const m=menuItems.find(x=>x.id===id); if(m){ m.active=val; save(); }
+  toast(val?'✅ เปิดขายแล้ว':'⛔ ปิดขายแล้ว');
+}
+
+function deleteMenuItem(id){
+  if(!confirm('ลบรายการนี้?')) return;
+  menuItems=menuItems.filter(m=>m.id!==id); save(); renderMenuList(); toast('🗑️ ลบแล้ว');
+}
+
+// ===================== STOCK =====================
+function renderStock(){
+  document.getElementById('sk-count').textContent = materials.length;
+  document.getElementById('sk-val').textContent = fmt(materials.reduce((s,m)=>s+m.qty*m.price,0));
+  const el = document.getElementById('stock-list');
+  if(!materials.length){ el.innerHTML='<div class="empty-state"><i class="ti ti-package"></i><p>ยังไม่มีวัตถุดิบ</p></div>'; return; }
+  el.innerHTML = materials.map(m=>{
+    const pct = m.min>0?Math.min(100,m.qty/m.min*50):100;
+    const cls = m.qty===0?'danger':m.qty<=m.min?'warn':'';
+    const st  = m.qty===0?'badge-red':m.qty<=m.min?'badge-amber':'badge-green';
+    const stL = m.qty===0?'หมด':m.qty<=m.min?'ใกล้หมด':'ปกติ';
+    return `<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:14px;font-weight:800">${m.name} <span style="font-size:12px;color:var(--muted)">(${m.unit})</span></div>
+        <span class="badge ${st}">${stL}</span>
+      </div>
+      <div style="display:flex;gap:14px;font-size:12px;color:var(--muted);margin-bottom:8px">
+        <span>เหลือ <b style="color:var(--text);font-size:14px">${m.qty}</b></span>
+        <span>ขั้นต่ำ ${m.min}</span>
+        <span>📍 ${m.loc||'-'}</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div>
+      <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-green" onclick="openStockAction(${m.id},'in')">📥 รับเข้า</button>
+        <button class="btn btn-sm btn-amber" onclick="openStockAction(${m.id},'out')">📤 เบิก</button>
+        <button class="btn btn-sm btn-ghost" onclick="editMat(${m.id})">✏️</button>
+        <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="deleteMat(${m.id})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openMatModal(){
+  document.getElementById('mmat-title').textContent='เพิ่มวัตถุดิบ';
+  ['mmat-id','mmat-name','mmat-unit','mmat-qty','mmat-min','mmat-price','mmat-loc'].forEach(i=>document.getElementById(i).value='');
+  openModal('modal-material');
+}
+
+function editMat(id){
+  const m=materials.find(x=>x.id===id);
+  document.getElementById('mmat-title').textContent='แก้ไขวัตถุดิบ';
+  document.getElementById('mmat-id').value=m.id;
+  document.getElementById('mmat-name').value=m.name;
+  document.getElementById('mmat-unit').value=m.unit;
+  document.getElementById('mmat-qty').value=m.qty;
+  document.getElementById('mmat-min').value=m.min;
+  document.getElementById('mmat-price').value=m.price;
+  document.getElementById('mmat-loc').value=m.loc||'';
+  openModal('modal-material');
+}
+
+function saveMaterial(){
+  const id=document.getElementById('mmat-id').value;
+  const name=document.getElementById('mmat-name').value.trim();
+  if(!name){ toast('⚠️ กรอกชื่อด้วย'); return; }
+  const data={name,unit:document.getElementById('mmat-unit').value,qty:+document.getElementById('mmat-qty').value||0,min:+document.getElementById('mmat-min').value||0,price:+document.getElementById('mmat-price').value||0,loc:document.getElementById('mmat-loc').value};
+  if(id){ const m=materials.find(x=>x.id==id); Object.assign(m,data); toast('✅ แก้ไขแล้ว'); }
+  else { materials.push({id:_matid++,log:[],...data}); toast('✅ เพิ่มแล้ว'); }
+  save(); closeModal('modal-material'); renderStock();
+}
+
+function deleteMat(id){
+  if(!confirm('ลบวัตถุดิบนี้?')) return;
+  materials=materials.filter(m=>m.id!==id); save(); renderStock(); toast('🗑️ ลบแล้ว');
+}
+
+function openStockAction(id, type){
+  const m=materials.find(x=>x.id===id);
+  document.getElementById('msa-title').textContent=type==='in'?'📥 รับวัตถุดิบเข้า':type==='out'?'📤 เบิกวัตถุดิบออก':'🔧 ปรับยอด';
+  document.getElementById('msa-name').textContent=m.name+' (เหลือ '+m.qty+' '+m.unit+')';
+  document.getElementById('msa-type').value=type;
+  document.getElementById('msa-id').value=id;
+  document.getElementById('msa-qty').value='';
+  document.getElementById('msa-note').value='';
+  openModal('modal-stock-action');
+}
+
+function doStockAction(){
+  const id=+document.getElementById('msa-id').value;
+  const type=document.getElementById('msa-type').value;
+  const qty=+document.getElementById('msa-qty').value;
+  const note=document.getElementById('msa-note').value;
+  if(!qty||qty<0){ toast('⚠️ กรอกจำนวนด้วย'); return; }
+  const m=materials.find(x=>x.id===id);
+  if(type==='in') m.qty+=qty;
+  else if(type==='out'){ if(m.qty<qty){ toast('⚠️ สต็อกไม่พอ'); return; } m.qty-=qty; }
+  else m.qty=qty;
+  m.log.push({type,qty,note,date:today(),time:fmtTime()});
+  save(); closeModal('modal-stock-action'); renderStock();
+  toast(type==='in'?`✅ รับเข้า +${qty}`:type==='out'?`✅ เบิกออก -${qty}`:`✅ ปรับยอดเป็น ${qty}`);
+}
+
+// ===================== HISTORY =====================
+let histPeriod = 'all';
+function setHistFilter(f, el){
+  histPeriod=f;
+  document.querySelectorAll('#page-history .scroll-tabs .chip').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  renderHistory();
+}
+
+function renderHistory(){
+  const q=(document.getElementById('hist-search').value||'').toLowerCase().trim();
+  const td=today(), tw=thisWeekStart(), tm2=thisMonth();
+  let shown = sales.filter(s=>{
+    if(histPeriod==='today'&&s.date!==td) return false;
+    if(histPeriod==='week'&&s.date<tw) return false;
+    if(histPeriod==='month'&&!s.date.startsWith(tm2)) return false;
+    if(q){
+      const names=(s.items||[]).map(i=>i.name.toLowerCase()+' '+(i.optLabels||[]).join(' ').toLowerCase()).join(' ');
+      const dateStr=(s.date||'')+' '+(s.time||'');
+      const totalStr=String(s.total||'');
+      if(!names.includes(q)&&!dateStr.includes(q)&&!totalStr.includes(q)) return false;
+    }
+    return true;
+  }).reverse();
+  document.getElementById('hist-count').textContent = shown.length+' ออเดอร์';
+  const el=document.getElementById('history-list');
+  if(!shown.length){ el.innerHTML='<div class="empty-state"><i class="ti ti-receipt"></i><p>ไม่มีรายการ</p></div>'; return; }
+  el.innerHTML = shown.map(s=>`
+    <div class="card" style="margin-bottom:10px${s.cancelled?';opacity:.5':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div>
+          <span class="badge ${s.cancelled?'badge-muted':'badge-orange'}">${s.cancelled?'ยกเลิก':'เสร็จแล้ว'}</span>
+          <span style="font-size:12px;color:var(--muted);margin-left:8px">${s.date} · ${s.time}</span>
+        </div>
+        <div style="font-size:17px;font-weight:900;color:var(--orange)">${fmt(s.total)}</div>
+      </div>
+      <div style="font-size:13px;color:var(--text)">${(s.items||[]).map(i=>`${i.name}${i.optLabels&&i.optLabels.length?' ('+i.optLabels.join(', ')+')':''} ×${i.qty}`).join('<br>')}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted);flex-wrap:wrap;gap:6px">
+        <span>กำไร <b style="color:var(--green)">${fmt(s.profit)}</b></span>
+        ${s.discount?`<span>ส่วนลด <b style="color:var(--red)">-${fmt(s.discount)}</b></span>`:''}
+        ${!s.cancelled?`<button class="btn btn-sm" style="background:var(--red-lt);color:var(--red);padding:4px 8px;font-size:11px" onclick="cancelOrder(${s.id})">ยกเลิก</button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function cancelOrder(id){
+  if(!confirm('ยกเลิกออเดอร์นี้?')) return;
+  const s=sales.find(x=>x.id===id);
+  if(s){ s.cancelled=true; s.total=0; s.profit=0; save(); renderHistory(); toast('❌ ยกเลิกออเดอร์แล้ว'); }
+}
+
+// ===================== REPORT =====================
+function setReportPeriod(p, el){ reportPeriod=p; document.querySelectorAll('#report-period-tabs .chip').forEach(x=>x.classList.remove('active')); el.classList.add('active'); renderReport(); }
+
+function filterSales(){
+  const td=today(), tw=thisWeekStart(), tm=thisMonth();
+  return sales.filter(s=>{
+    if(s.cancelled) return false;
+    if(reportPeriod==='today') return s.date===td;
+    if(reportPeriod==='week') return s.date>=tw;
+    if(reportPeriod==='month') return s.date&&s.date.startsWith(tm);
+    return true;
+  });
+}
+
+function renderReport(){
+  const ss = filterSales();
+  const rev = ss.reduce((s,x)=>s+x.total,0);
+  const pft = ss.reduce((s,x)=>s+x.profit,0);
+  const pcs = ss.reduce((s,x)=>(x.items||[]).reduce((ss,i)=>ss+i.qty,s),0);
+  document.getElementById('r-revenue').textContent = fmt(rev);
+  document.getElementById('r-profit').textContent = fmt(pft);
+  document.getElementById('r-orders').textContent = ss.length;
+  document.getElementById('r-pieces').textContent = pcs;
+
+  // top opts chart
+  const optMap={}, prodMap={};
+  ss.forEach(s=>(s.items||[]).forEach(i=>{
+    prodMap[i.name]=(prodMap[i.name]||0)+i.qty;
+    (i.opts||[]).forEach(o=>{ optMap[o.name]=(optMap[o.name]||0)+i.qty; });
+  }));
+  const allMap = {...prodMap,...optMap};
+  const sorted = Object.entries(allMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const rc = document.getElementById('r-top-chart');
+  if(!sorted.length){ rc.innerHTML='<div class="empty-state" style="padding:16px 0"><i class="ti ti-chart-bar"></i><p>ยังไม่มีข้อมูล</p></div>'; }
+  else { const mx=sorted[0][1]; rc.innerHTML=sorted.map(([n,q])=>`<div class="bar-item"><div class="bar-meta"><span>${n}</span><span style="font-weight:800;color:var(--orange)">${q}×</span></div><div class="bar-track"><div class="bar-fill" style="width:${(q/mx*100).toFixed(0)}%"></div></div></div>`).join(''); }
+
+  // cost vs revenue
+  const totalCost = ss.reduce((s,x)=>(x.items||[]).reduce((ss,i)=>ss+i.cost*i.qty,s),0);
+  const totalRev = rev;
+  const cc = document.getElementById('r-cost-chart');
+  if(!totalRev){ cc.innerHTML='<div class="empty-state" style="padding:12px 0"><p>ยังไม่มีข้อมูล</p></div>'; }
+  else {
+    const costPct = (totalCost/totalRev*100).toFixed(0);
+    const profPct = (100-costPct);
+    cc.innerHTML=`
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <div style="flex:1;background:var(--red-lt);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:11px;color:var(--red);font-weight:700">ต้นทุน</div>
+          <div style="font-size:18px;font-weight:900;color:var(--red)">${fmt(totalCost)}</div>
+        </div>
+        <div style="flex:1;background:var(--green-lt);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:11px;color:var(--green);font-weight:700">กำไร</div>
+          <div style="font-size:18px;font-weight:900;color:var(--green)">${fmt(Math.max(0,pft))}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:700">สัดส่วนกำไร ${profPct}% | ต้นทุน ${costPct}%</div>
+      <div class="bar-track" style="height:12px">
+        <div style="height:100%;background:var(--green);width:${profPct}%;border-radius:4px;display:inline-block;float:left"></div>
+      </div>`;
+  }
+
+  // material usage (estimate from opts)
+  const ml = document.getElementById('r-material-chart');
+  const matEst = {};
+  ss.forEach(s=>(s.items||[]).forEach(i=>{
+    (i.opts||[]).forEach(o=>{ matEst[o.name]=(matEst[o.name]||0)+i.qty; });
+    matEst[i.name]=(matEst[i.name]||0)+i.qty;
+  }));
+  const matSorted = Object.entries(matEst).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(!matSorted.length){ ml.innerHTML='<div class="empty-state" style="padding:12px 0"><p>ยังไม่มีข้อมูล</p></div>'; }
+  else { const mx2=matSorted[0][1]; ml.innerHTML=matSorted.map(([n,q])=>`<div class="bar-item"><div class="bar-meta"><span>${n}</span><span>${q}×</span></div><div class="bar-track"><div class="bar-fill" style="width:${(q/mx2*100).toFixed(0)}%;background:linear-gradient(90deg,var(--blue),var(--purple))"></div></div></div>`).join(''); }
+}
+
+// ===================== SETTINGS =====================
+function renderSettings(){
+  document.getElementById('cfg-name').value=config.name||'';
+  document.getElementById('cfg-addr').value=config.addr||'';
+  document.getElementById('cfg-phone').value=config.phone||'';
+  document.getElementById('cfg-promptpay').value=config.promptpay||'';
+  document.getElementById('cfg-total-orders').textContent=sales.filter(s=>!s.cancelled).length;
+  document.getElementById('cfg-total-rev').textContent=fmt(sales.filter(s=>!s.cancelled).reduce((s,x)=>s+x.total,0));
+}
+
+function saveConfig(){
+  config.name=document.getElementById('cfg-name').value;
+  config.addr=document.getElementById('cfg-addr').value;
+  config.phone=document.getElementById('cfg-phone').value;
+  config.promptpay=document.getElementById('cfg-promptpay').value;
+  save(); toast('✅ บันทึกแล้ว');
+  document.querySelector('.topbar .logo').innerHTML=`🥞 <span>${config.name||'เครปโปร'}</span> <span class="sub">POS System</span>`;
+}
+
+function clearData(){
+  if(!confirm('ล้างข้อมูลทั้งหมด? ไม่สามารถกู้คืนได้')) return;
+  sales=[]; menuItems=defaultMenuItems(); materials=defaultMaterials(); cart=[];
+  _mid=Math.max(0,...menuItems.map(m=>m.id))+1;
+  _matid=Math.max(0,...materials.map(m=>m.id))+1;
+  _sid=1;
+  save(); renderSettings(); toast('🗑️ ล้างข้อมูลแล้ว');
+}
+
+// ===================== GOOGLE SHEETS =====================
+const GS_URL='https://script.google.com/macros/s/AKfycbyQ35RA0i-6cL_FP04T1ZuZ5rbdqzCfG1u4HapKcdwa33EnSnca-dl-5fhUMXJVAXgLpA/exec';
+
+async function gsGet(params){
+  const url=GS_URL+'?'+new URLSearchParams(params);
+  const r=await fetch(url);
+  return r.json();
+}
+async function gsPost(data){
+  const r=await fetch(GS_URL,{method:'POST',body:JSON.stringify(data)});
+  return r.json();
+}
+
+// ===================== INCOMING CUSTOMER ORDERS =====================
+let _knownOrderIds = new Set();
+
+async function pollCustomerOrders(){
+  const panel  = document.getElementById('incoming-panel');
+  const countEl= document.getElementById('incoming-count');
+  const listEl = document.getElementById('incoming-list');
+  try{
+    const res = await gsGet({action:'getOrders'});
+    if(!res.ok) return;
+    const pending = (res.orders||[]).filter(o=>o.status==='รอดำเนินการ');
+
+    // detect new orders for notification
+    const newOnes = pending.filter(o=>!_knownOrderIds.has(String(o.id)));
+    if(newOnes.length){
+      newOnes.forEach(o=>_knownOrderIds.add(String(o.id)));
+      // flash title if not on POS page
+      if(!document.getElementById('page-pos').classList.contains('active')){
+        document.title='🔔 มีออเดอร์ใหม่!';
+        setTimeout(()=>{ document.title='🥞 ระบบร้านเครป'; },3000);
+      }
+    }
+
+    if(!pending.length){ panel.style.display='none'; return; }
+    panel.style.display='block';
+    countEl.textContent=pending.length;
+    listEl.innerHTML=pending.map(o=>`
+      <div class="incoming-card" id="inc-${o.id}">
+        <div class="incoming-header">
+          <span class="incoming-num">🔔 ออเดอร์ #${String(o.id).slice(-4)}</span>
+          <span class="incoming-time">${o.time||''}</span>
+        </div>
+        <div class="incoming-items">${(o.items||[]).map(i=>`${i.emoji||'🥞'} <b>${i.name}</b>${i.optLabels&&i.optLabels.length?' ('+i.optLabels.join(', ')+')':''} ×${i.qty} <span style="color:var(--orange);font-weight:800">฿${i.sub}</span>`).join('<br>')}</div>
+        <div class="incoming-total">ยอดรวม ฿${o.total}</div>
+        <div class="incoming-actions">
+          <button class="btn btn-sm btn-green" onclick="acceptCustomerOrder('${o.id}',${JSON.stringify(o.items||[]).replace(/'/g,"&#39;")})" style="flex:1">✅ รับออเดอร์ลง POS</button>
+          <button class="btn btn-sm btn-red" onclick="dismissCustomerOrder('${o.id}')" style="flex:1">❌ ปฏิเสธ</button>
+        </div>
+      </div>`).join('');
+  } catch(e){ /* ไม่มีเน็ต ข้ามไป */ }
+}
+
+async function acceptCustomerOrder(id, items){
+  // add to cart
+  (items||[]).forEach(item=>{
+    const cartKey=`gs_${id}_${item.name}`;
+    cart.push({
+      key:cartKey,prodId:0,name:item.name,dough:item.dough||'',
+      opts:[],optLabels:item.optLabels||[],
+      qty:item.qty,unitPrice:item.unitPrice,cost:0
+    });
+  });
+  // update status in Sheets
+  try{ await gsPost({action:'updateOrder',id,status:'กำลังทำ'}); } catch(e){}
+  _knownOrderIds.add(String(id));
+  toast(`✅ รับออเดอร์ #${String(id).slice(-4)} แล้ว`);
+  pollCustomerOrders();
+  renderPOSSummary();
+}
+
+async function dismissCustomerOrder(id){
+  if(!confirm('ปฏิเสธออเดอร์นี้?')) return;
+  try{ await gsPost({action:'updateOrder',id,status:'ยกเลิก'}); } catch(e){}
+  toast('❌ ปฏิเสธออเดอร์แล้ว');
+  pollCustomerOrders();
+}
+
+// Poll ทุก 5 วินาที
+setInterval(pollCustomerOrders, 5000);
+
+// ===================== CALENDAR (DATE RANGE) =====================
+const CAL_MONTHS_TH = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const CAL_DOWS = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+// per-page state: year, month, rangeStart, rangeEnd, picking (0=none,1=start,2=end)
+const calState = {
+  dash:  { year:0, month:0, rangeStart:'', rangeEnd:'', picking:0 },
+  stock: { year:0, month:0, rangeStart:'', rangeEnd:'', picking:0 },
+  report:{ year:0, month:0, rangeStart:'', rangeEnd:'', picking:0 },
+};
+
+function calToggle(page){
+  const wrap = document.getElementById(`cal-${page}-wrap`);
+  const isOpen = wrap.style.display !== 'none';
+  wrap.style.display = isOpen ? 'none' : 'block';
+  document.querySelectorAll(`#page-${page} .cal-toggle-btn`).forEach(b=>b.classList.toggle('open',!isOpen));
+  if(!isOpen){
+    const now = new Date();
+    calState[page].year  = now.getFullYear();
+    calState[page].month = now.getMonth();
+    if(!calState[page].picking) calState[page].picking = 1;
+    renderCal(page);
+  }
+}
+
+function calMove(page, dir){
+  let { year, month } = calState[page];
+  month += dir;
+  if(month > 11){ month=0; year++; }
+  if(month < 0) { month=11; year--; }
+  calState[page].year  = year;
+  calState[page].month = month;
+  renderCal(page);
+}
+
+function calClear(page){
+  calState[page].rangeStart = '';
+  calState[page].rangeEnd   = '';
+  calState[page].picking    = 1;
+  renderCal(page);
+  // reset data
+  if(page==='dash') renderDash();
+  if(page==='report') renderReport();
+}
+
+function calSelect(page, ds){
+  const st = calState[page];
+  if(st.picking === 1){
+    // first click — set start, clear end
+    st.rangeStart = ds;
+    st.rangeEnd   = '';
+    st.picking    = 2;
+  } else {
+    // second click — set end (swap if needed)
+    if(ds < st.rangeStart){
+      st.rangeEnd   = st.rangeStart;
+      st.rangeStart = ds;
+    } else {
+      st.rangeEnd = ds;
+    }
+    st.picking = 1; // ready for next range
+    // apply filter
+    applyCalRange(page);
+  }
+  renderCal(page);
+}
+
+function applyCalRange(page){
+  const { rangeStart, rangeEnd } = calState[page];
+  if(!rangeStart || !rangeEnd) return;
+  if(page === 'dash')   renderDashForRange(rangeStart, rangeEnd);
+  if(page === 'report') renderReportForRange(rangeStart, rangeEnd);
+  if(page === 'stock')  renderStockForRange(rangeStart, rangeEnd);
+}
+
+function renderCal(page){
+  const st = calState[page];
+  const { year, month, rangeStart, rangeEnd, picking } = st;
+  const todayStr = today();
+
+  document.getElementById(`cal-${page}-title`).textContent =
+    CAL_MONTHS_TH[month] + ' ' + (year+543);
+
+  const saleDates = new Set(sales.filter(s=>!s.cancelled).map(s=>s.date));
+
+  const firstDay    = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInPrev  = new Date(year, month, 0).getDate();
+
+  const grid = document.getElementById(`cal-${page}-grid`);
+  let html = CAL_DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // prev month
+  for(let i = firstDay-1; i >= 0; i--){
+    html += `<div class="cal-day other-month"><span class="cal-num">${daysInPrev-i}</span></div>`;
+  }
+
+  // current month
+  for(let d = 1; d <= daysInMonth; d++){
+    const ds = year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday = ds === todayStr;
+    const hasSales = saleDates.has(ds);
+    const isStart  = ds === rangeStart;
+    const isEnd    = ds === rangeEnd;
+    const inRange  = rangeStart && rangeEnd && ds > rangeStart && ds < rangeEnd;
+
+    let cls = 'cal-day';
+    if(isToday)    cls += ' today';
+    if(isStart)    cls += ' range-start';
+    if(isEnd)      cls += ' range-end';
+    if(inRange)    cls += ' in-range';
+
+    const dot = hasSales ? `<span class="cal-dot"></span>` : '';
+    html += `<div class="${cls}" onclick="calSelect('${page}','${ds}')"><span class="cal-num">${d}</span>${dot}</div>`;
+  }
+
+  // next month
+  const total = Math.ceil((firstDay+daysInMonth)/7)*7;
+  for(let d = 1; d <= total-firstDay-daysInMonth; d++){
+    html += `<div class="cal-day other-month"><span class="cal-num">${d}</span></div>`;
+  }
+  grid.innerHTML = html;
+
+  // hint text
+  const hintEl = document.getElementById(`cal-${page}-hint`);
+  if(hintEl) hintEl.textContent = picking===2 ? `เริ่ม: ${rangeStart} · กดวันสิ้นสุด` : 'กดวันเริ่มต้น';
+
+  // range bar
+  const bar    = document.getElementById(`cal-${page}-bar`);
+  const rangeT = document.getElementById(`cal-${page}-range-txt`);
+  if(bar && rangeStart && rangeEnd){
+    bar.style.display = 'flex';
+    rangeT.textContent = `📅 ${rangeStart}  →  ${rangeEnd}`;
+  } else if(bar){
+    bar.style.display = 'none';
+  }
+
+  // outside label
+  const outerLabel = document.getElementById(`cal-${page}-selected-label`);
+  if(outerLabel){
+    if(rangeStart && rangeEnd){
+      const ranged = sales.filter(s=>!s.cancelled&&s.date>=rangeStart&&s.date<=rangeEnd);
+      const tot = ranged.reduce((s,x)=>s+x.total,0);
+      outerLabel.textContent = `${rangeStart} → ${rangeEnd} · ${ranged.length} ออเดอร์ · ${fmt(tot)}`;
+    } else { outerLabel.textContent = ''; }
+  }
+}
+
+// ── Apply range to each page ──
+function renderDashForRange(from, to){
+  const ss = sales.filter(s=>!s.cancelled && s.date>=from && s.date<=to);
+  document.getElementById('d-sales').textContent   = fmt(ss.reduce((s,x)=>s+x.total,0));
+  document.getElementById('d-profit').textContent  = fmt(ss.reduce((s,x)=>s+x.profit,0));
+  document.getElementById('d-orders').textContent  = ss.length;
+  document.getElementById('d-month').textContent   = fmt(ss.reduce((s,x)=>s+x.total,0));
+
+  const optMap={};
+  ss.forEach(s=>(s.items||[]).forEach(i=>(i.opts||[]).forEach(o=>{optMap[o.name]=(optMap[o.name]||0)+i.qty})));
+  const sorted=Object.entries(optMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const ti=document.getElementById('d-top-items');
+  if(!sorted.length){ ti.innerHTML='<div class="empty-state" style="padding:12px 0"><i class="ti ti-chart-bar"></i><p>ยังไม่มีข้อมูล</p></div>'; }
+  else { const mx=sorted[0][1]; ti.innerHTML=sorted.map(([n,q])=>`<div class="bar-item"><div class="bar-meta"><span>${n}</span><span style="color:var(--orange)">${q}×</span></div><div class="bar-track"><div class="bar-fill" style="width:${(q/mx*100).toFixed(0)}%"></div></div></div>`).join(''); }
+
+  const ro=document.getElementById('d-recent-orders');
+  if(!ss.length){ ro.innerHTML='<div class="empty-state" style="padding:12px 0"><i class="ti ti-receipt"></i><p>ไม่มีออเดอร์</p></div>'; }
+  else { ro.innerHTML=[...ss].reverse().slice(0,4).map(s=>`<div class="row-item"><div class="row-icon" style="background:var(--orange-lt);color:var(--orange)"><i class="ti ti-receipt"></i></div><div class="row-info"><div class="row-title">${(s.items||[]).map(i=>i.name).join(', ')}</div><div class="row-sub">${s.date} · ${s.time}</div></div><div class="row-right" style="font-weight:900;color:var(--orange)">${fmt(s.total)}</div></div>`).join(''); }
+}
+
+function renderReportForRange(from, to){
+  const ss = sales.filter(s=>!s.cancelled && s.date>=from && s.date<=to);
+  document.getElementById('r-revenue').textContent = fmt(ss.reduce((s,x)=>s+x.total,0));
+  document.getElementById('r-profit').textContent  = fmt(ss.reduce((s,x)=>s+x.profit,0));
+  document.getElementById('r-orders').textContent  = ss.length;
+  document.getElementById('r-pieces').textContent  = ss.reduce((s,x)=>(x.items||[]).reduce((ss,i)=>ss+i.qty,s),0);
+  document.querySelectorAll('#report-period-tabs .chip').forEach(x=>x.classList.remove('active'));
+}
+
+function renderStockForRange(from, to){
+  // just highlight — stock page shows materials not sales, so toast info
+  const ss = sales.filter(s=>!s.cancelled && s.date>=from && s.date<=to);
+  toast(`📅 ${from} → ${to} · ${ss.length} ออเดอร์`);
+}
+
+// ===================== INIT =====================
+const now = new Date();
+document.getElementById('top-date').innerHTML = now.toLocaleDateString('th-TH',{day:'numeric',month:'short'})+`<br>${now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}`;
+renderDash();
+</script>
+</body>
+</html>

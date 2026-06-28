@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🥞 สั่งเครป</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --or:#FF6B35;--or-lt:#FFF3EE;--or-dk:#D94F1A;
+  --cream:#FFFDF9;--brown:#4A2C0A;--brown-lt:#F9F0E6;
+  --green:#22C55E;--green-dk:#15803D;
+  --red:#EF4444;
+  --card:#fff;--border:#F0E6D8;--text:#2A1500;--muted:#9C7B5A;
+  --sh:0 2px 12px rgba(74,44,10,.08);
+}
+html,body{height:100%;overflow:hidden;-webkit-tap-highlight-color:transparent}
+body{font-family:'Sarabun','Noto Sans Thai',sans-serif;background:var(--cream);color:var(--text);font-size:15px}
+
+/* ── SCREENS ── */
+.screen{display:none;position:fixed;inset:0;flex-direction:column;background:var(--cream)}
+.screen.on{display:flex}
+
+/* ── SCROLLABLE CONTENT ── */
+.scr-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px}
+
+/* ── FIXED FOOTER ── */
+.scr-foot{flex-shrink:0;padding:10px 14px 22px;background:rgba(255,253,249,.96);border-top:1px solid var(--border);backdrop-filter:blur(10px)}
+
+/* ── WELCOME ── */
+#sw{background:linear-gradient(155deg,#FF6B35,#FF9A5C 55%,#FFD580);
+    align-items:center;justify-content:center;text-align:center;padding:32px 24px}
+.wlogo{font-size:84px;margin-bottom:6px}
+.wshop{font-size:26px;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.15)}
+.wsub{font-size:14px;color:rgba(255,255,255,.85);margin-top:4px;font-weight:600}
+.wdiv{width:44px;height:3px;background:rgba(255,255,255,.35);border-radius:2px;margin:22px auto}
+.wbtn{background:#fff;color:var(--or);border:none;border-radius:16px;padding:18px 52px;
+      font-size:18px;font-weight:900;cursor:pointer;font-family:inherit;
+      box-shadow:0 8px 32px rgba(0,0,0,.18);transition:transform .12s}
+.wbtn:active{transform:scale(.96)}
+.wnote{font-size:12px;color:rgba(255,255,255,.65);margin-top:18px}
+
+/* ── HEADER ── */
+.shdr{background:var(--or);padding:12px 14px 10px;flex-shrink:0;box-shadow:0 2px 12px rgba(255,107,53,.28)}
+.shdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sname{font-size:14px;font-weight:900;color:#fff}
+.sbtn{background:rgba(255,255,255,.2);border:none;border-radius:8px;padding:6px 11px;
+      color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+      display:flex;align-items:center;gap:3px}
+.sbtn:active{opacity:.7}
+/* dots */
+.sdots{display:flex;align-items:center}
+.dot{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.25);
+     display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;
+     color:rgba(255,255,255,.6);flex-shrink:0;transition:all .2s}
+.dot.on{background:#fff;color:var(--or)}
+.dot.dn{background:rgba(255,255,255,.85);color:var(--green-dk)}
+.dline{flex:1;height:2px;background:rgba(255,255,255,.2)}
+.dline.dn{background:rgba(255,255,255,.65)}
+.stitle{font-size:15px;font-weight:900;color:#fff;margin-top:7px}
+.ssub{font-size:11.5px;color:rgba(255,255,255,.8);margin-top:2px}
+
+/* ── CAT TABS ── */
+.cat-row{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;scrollbar-width:none}
+.cat-row::-webkit-scrollbar{display:none}
+.chip{padding:6px 14px;background:#fff;border:1.5px solid var(--border);border-radius:20px;
+      font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.chip.on{background:var(--or);color:#fff;border-color:var(--or)}
+
+/* ── PRODUCT GRID ── */
+.pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.pcard{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:14px 12px;
+       cursor:pointer;text-align:center;box-shadow:var(--sh);transition:all .12s}
+.pcard:active{border-color:var(--or);transform:scale(.97)}
+.pemoji{font-size:44px;line-height:1;margin-bottom:8px}
+.pname{font-size:13px;font-weight:800;color:var(--brown);line-height:1.3}
+.pcat{font-size:10.5px;color:var(--muted);margin-top:3px}
+.pprice{font-size:16px;font-weight:900;color:var(--or);margin-top:6px}
+
+/* ── OPTION CARDS ── */
+.sec-lbl{font-size:11.5px;font-weight:900;color:var(--muted);text-transform:uppercase;
+         letter-spacing:.6px;margin-bottom:9px;display:flex;align-items:center;gap:5px;margin-top:14px}
+.sec-lbl:first-child{margin-top:0}
+.ocard{display:flex;align-items:center;gap:11px;background:#fff;border:1.5px solid var(--border);
+       border-radius:12px;padding:12px 13px;margin-bottom:8px;cursor:pointer;transition:all .12s}
+.ocard:active{transform:scale(.98)}
+.ocard.sel{border-color:var(--or);background:var(--or-lt)}
+.ocheck{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;
+        display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;transition:all .18s}
+.ocard.sel .ocheck{background:var(--or);border-color:var(--or);color:#fff}
+.oradio{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:all .18s;position:relative}
+.ocard.sel .oradio{border-color:var(--or)}
+.ocard.sel .oradio::after{content:'';position:absolute;width:10px;height:10px;border-radius:50%;
+  background:var(--or);top:50%;left:50%;transform:translate(-50%,-50%)}
+.oemoji{font-size:26px;flex-shrink:0}
+.oinfo{flex:1}
+.oname{font-size:14px;font-weight:700}
+.oprice{font-size:12px;font-weight:700;margin-top:2px}
+.oprice.free{color:var(--green-dk)}
+.oprice.plus{color:var(--or)}
+
+/* ── SUMMARY BAR ── */
+.sumbar{background:var(--brown-lt);border-radius:10px;padding:9px 13px;
+        font-size:13px;color:var(--brown);margin-bottom:13px;line-height:1.6}
+.sumbar strong{color:var(--or)}
+
+/* ── CONFIRM STEP 4 ── */
+.conf-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--sh)}
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--border);border-radius:10px;overflow:hidden}
+.stepper button{width:40px;height:40px;border:none;background:none;font-size:22px;font-weight:900;color:var(--or);cursor:pointer}
+.stepper button:active{background:var(--or-lt)}
+.stepper span{font-size:17px;font-weight:900;min-width:38px;text-align:center;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+
+/* ── BASKET (confirm screen) ── */
+.bitem{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-bottom:1px solid var(--border)}
+.bitem:last-child{border-bottom:none}
+.bnum{width:26px;height:26px;border-radius:50%;background:var(--or);color:#fff;font-size:11px;font-weight:900;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.binfo{flex:1}
+.bname{font-size:14px;font-weight:800;color:var(--brown)}
+.bopts{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.bprice{font-size:15px;font-weight:900;color:var(--or);flex-shrink:0}
+.bbtns{display:flex;align-items:center;gap:7px;margin-top:7px}
+.bqbtn{width:27px;height:27px;border-radius:7px;border:1.5px solid var(--border);
+       background:#fff;font-size:16px;font-weight:900;color:var(--or);cursor:pointer}
+
+/* ── BASKET PILL ── */
+.bpill{position:fixed;bottom:80px;right:14px;background:var(--or);color:#fff;border:none;
+       border-radius:30px;padding:10px 17px;font-size:13px;font-weight:800;cursor:pointer;
+       box-shadow:0 4px 16px rgba(255,107,53,.4);display:flex;align-items:center;gap:7px;z-index:99;transition:all .2s}
+.bpill.hide{display:none}
+
+/* ── BIG BUTTONS ── */
+.bigbtn{width:100%;padding:15px;background:var(--or);color:#fff;border:none;border-radius:13px;
+        font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;
+        display:flex;align-items:center;justify-content:center;gap:9px;
+        box-shadow:0 5px 18px rgba(255,107,53,.32);transition:all .12s}
+.bigbtn:active{transform:scale(.98);opacity:.9}
+.bigbtn:disabled{background:var(--border);color:var(--muted);box-shadow:none}
+.bigbtn.gr{background:var(--green);box-shadow:0 5px 18px rgba(34,197,94,.32)}
+.bigbtn.ghost{background:var(--or-lt);color:var(--or);box-shadow:none;border:1.5px solid rgba(255,107,53,.22)}
+.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ── SUCCESS ── */
+#ss{background:linear-gradient(155deg,var(--green),#86EFAC);
+    align-items:center;justify-content:center;text-align:center;padding:32px 24px}
+.sico{font-size:88px;margin-bottom:8px}
+.stit{font-size:24px;font-weight:900;color:#fff}
+.ssub2{font-size:14px;color:rgba(255,255,255,.85);font-weight:600;line-height:1.7;margin-top:6px}
+.snum{display:inline-block;background:rgba(255,255,255,.25);color:#fff;font-size:20px;font-weight:900;padding:8px 24px;border-radius:30px;margin:14px 0}
+.snote{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px}
+.sbk{background:#fff;color:var(--green-dk);border:none;border-radius:13px;padding:14px 36px;font-size:15px;font-weight:900;cursor:pointer;margin-top:26px;font-family:inherit}
+.tag{background:var(--or-lt);color:var(--or-dk);border-radius:20px;padding:4px 11px;font-size:11.5px;font-weight:700;display:inline-block;margin:2px}
+.div{height:1px;background:var(--border);margin:12px 0}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ══ WELCOME ══ -->
+<div class="screen on" id="sw">
+  <div class="wlogo">🥞</div>
+  <div class="wshop" id="wshop">เครปโปร</div>
+  <div class="wsub">ยินดีต้อนรับครับ</div>
+  <div class="wdiv"></div>
+  <button class="wbtn" onclick="startOrder()">🛒 เริ่มสั่งอาหาร</button>
+  <div class="wnote">แตะเพื่อเริ่มสั่ง</div>
+</div>
+
+<!-- ══ STEP 1: เลือกเมนู ══ -->
+<div class="screen" id="s1">
+  <div class="shdr">
+    <div class="shdr-top">
+      <div class="sname" id="s1n">เครปโปร</div>
+      <button class="sbtn" onclick="go('sw')"><i class="ti ti-home"></i> หน้าแรก</button>
+    </div>
+    <div class="sdots">
+      <div class="dot on">1</div><div class="dline"></div>
+      <div class="dot">2</div><div class="dline"></div>
+      <div class="dot">3</div><div class="dline"></div>
+      <div class="dot">4</div>
+    </div>
+    <div class="stitle">เลือกเมนู</div>
+    <div class="ssub">เลือกเมนูเครปที่ต้องการ</div>
+  </div>
+  <div class="scr-body">
+    <div class="cat-row" id="cats"></div>
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+  <button class="bpill hide" id="bpill" onclick="go('sc');renderConfirm()">
+    <i class="ti ti-shopping-bag"></i><span id="bpilltxt">ดูตะกร้า</span>
+  </button>
+</div>
+
+<!-- ══ STEP 2: แป้ง ══ -->
+<div class="screen" id="s2">
+  <div class="shdr">
+    <div class="shdr-top">
+      <button class="sbtn" onclick="go('s1')"><i class="ti ti-chevron-left"></i> ย้อนกลับ</button>
+      <div class="sname" id="s2lbl" style="font-size:12px;opacity:.85"></div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="sdots">
+      <div class="dot dn">✓</div><div class="dline dn"></div>
+      <div class="dot on">2</div><div class="dline"></div>
+      <div class="dot">3</div><div class="dline"></div>
+      <div class="dot">4</div>
+    </div>
+    <div class="stitle">เลือกแป้ง</div>
+    <div class="ssub">เลือกได้ 1 อย่าง</div>
+  </div>
+  <div class="scr-body">
+    <div class="sumbar" id="s2sum"></div>
+    <div class="sec-lbl"><i class="ti ti-bread"></i> แป้งเครป</div>
+    <div id="dlist"></div>
+  </div>
+  <div class="scr-foot">
+    <button class="bigbtn" onclick="go('s3');renderTopsExts()">ถัดไป → เลือกหน้า & ท็อปปิ้ง <i class="ti ti-arrow-right"></i></button>
+  </div>
+</div>
+
+<!-- ══ STEP 3: หน้า + ท็อปปิ้ง (หน้าเดียวกัน) ══ -->
+<div class="screen" id="s3">
+  <div class="shdr">
+    <div class="shdr-top">
+      <button class="sbtn" onclick="go('s2');renderDough()"><i class="ti ti-chevron-left"></i> ย้อนกลับ</button>
+      <div class="sname" id="s3lbl" style="font-size:12px;opacity:.85"></div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="sdots">
+      <div class="dot dn">✓</div><div class="dline dn"></div>
+      <div class="dot dn">✓</div><div class="dline dn"></div>
+      <div class="dot on">3</div><div class="dline"></div>
+      <div class="dot">4</div>
+    </div>
+    <div class="stitle">หน้า & ท็อปปิ้ง</div>
+    <div class="ssub">เลือกได้หลายอย่าง หรือข้ามได้</div>
+  </div>
+  <div class="scr-body">
+    <div class="sumbar" id="s3sum"></div>
+    <div class="sec-lbl"><i class="ti ti-meat"></i> หน้าเครป (เลือกได้หลายอย่าง)</div>
+    <div id="tlist"></div>
+    <div class="sec-lbl"><i class="ti ti-cheese"></i> ท็อปปิ้ง (เลือกได้หลายอย่าง)</div>
+    <div id="elist"></div>
+  </div>
+  <div class="scr-foot">
+    <button class="bigbtn" onclick="go('s4');renderStep4()">ถัดไป → กำหนดจำนวน <i class="ti ti-arrow-right"></i></button>
+  </div>
+</div>
+
+<!-- ══ STEP 4: จำนวน ══ -->
+<div class="screen" id="s4">
+  <div class="shdr">
+    <div class="shdr-top">
+      <button class="sbtn" onclick="go('s3');renderTopsExts()"><i class="ti ti-chevron-left"></i> ย้อนกลับ</button>
+      <div class="sname" style="font-size:12px;opacity:.85">ยืนยันรายการ</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="sdots">
+      <div class="dot dn">✓</div><div class="dline dn"></div>
+      <div class="dot dn">✓</div><div class="dline dn"></div>
+      <div class="dot dn">✓</div><div class="dline dn"></div>
+      <div class="dot on">4</div>
+    </div>
+    <div class="stitle">กำหนดจำนวน</div>
+    <div class="ssub">ตรวจสอบก่อนเพิ่มลงตะกร้า</div>
+  </div>
+  <div class="scr-body">
+    <div class="conf-card">
+      <div style="display:flex;align-items:center;gap:13px;margin-bottom:13px">
+        <div id="c4em" style="font-size:46px;line-height:1"></div>
+        <div>
+          <div id="c4nm" style="font-size:17px;font-weight:900;color:var(--brown)"></div>
+          <div id="c4dg" style="font-size:12px;color:var(--muted);margin-top:2px"></div>
+        </div>
+      </div>
+      <div id="c4op" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:13px"></div>
+      <div class="div"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:13px">
+        <div class="stepper">
+          <button onclick="chQty(-1)">−</button>
+          <span id="c4q">1</span>
+          <button onclick="chQty(1)">+</button>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--muted);font-weight:700">ราคา</div>
+          <div id="c4pr" style="font-size:26px;font-weight:900;color:var(--or)">฿0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scr-foot two-btn">
+    <button class="bigbtn ghost" onclick="addCont()"><i class="ti ti-plus"></i> เพิ่ม + สั่งต่อ</button>
+    <button class="bigbtn gr" onclick="addDone()"><i class="ti ti-check"></i> เพิ่มลงตะกร้า</button>
+  </div>
+</div>
+
+<!-- ══ CONFIRM: ตะกร้า ══ -->
+<div class="screen" id="sc">
+  <div class="shdr" style="background:var(--brown)">
+    <div class="shdr-top">
+      <button class="sbtn" onclick="go('s1')" style="background:rgba(255,255,255,.15)"><i class="ti ti-plus"></i> เพิ่มเครป</button>
+      <div class="sname">🛒 ตะกร้าสินค้า</div>
+      <div style="width:70px"></div>
+    </div>
+  </div>
+  <div class="scr-body">
+    <div class="conf-card" id="bcards"></div>
+    <div class="conf-card" style="margin-top:10px">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:4px 0">
+        <span>รายการ</span><span id="bcnt" style="font-weight:800;color:var(--text)">0 ชิ้น</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:900;padding-top:10px;border-top:1px solid var(--border);color:var(--or);margin-top:6px">
+        <span>ยอดรวม</span><span id="btot">฿0</span>
+      </div>
+    </div>
+  </div>
+  <div class="scr-foot">
+    <button class="bigbtn gr" id="sendbtn" onclick="sendOrder()"><i class="ti ti-send"></i> ส่งออเดอร์ให้ร้าน</button>
+  </div>
+</div>
+
+<!-- ══ SUCCESS ══ -->
+<div class="screen" id="ss">
+  <div class="sico">🎉</div>
+  <div class="stit">ส่งออเดอร์แล้ว!</div>
+  <div class="ssub2">ร้านรับออเดอร์แล้วนะครับ<br>กรุณารอสักครู่</div>
+  <div class="snum" id="snum">#0001</div>
+  <div id="ssum" style="font-size:13px;color:rgba(255,255,255,.85);line-height:2.1"></div>
+  <div class="snote">💰 ชำระเงินกับพนักงาน</div>
+  <button class="sbk" onclick="reset()">🥞 สั่งใหม่อีกครั้ง</button>
+</div>
+
+<script>
+const DB={
+  g(k){try{return JSON.parse(localStorage.getItem('crepe_'+k)||'null')}catch{return null}},
+  s(k,v){localStorage.setItem('crepe_'+k,JSON.stringify(v))}
+};
+
+const DEF=()=>[
+  {id:1,type:'base',name:'แป้งธรรมดา',price:0,cost:0,emoji:'🥞',active:true,cat:''},
+  {id:2,type:'base',name:'แป้งช็อกโกแลต',price:10,cost:4,emoji:'🍫',active:true,cat:''},
+  {id:3,type:'base',name:'แป้งชาเขียว',price:15,cost:5,emoji:'🍵',active:true,cat:''},
+  {id:4,type:'base',name:'แป้งสตรอว์เบอร์รี',price:10,cost:4,emoji:'🍓',active:true,cat:''},
+  {id:5,type:'topping',name:'ไส้กรอก',price:20,cost:8,emoji:'🌭',active:true,cat:''},
+  {id:6,type:'topping',name:'ปูอัด',price:15,cost:5,emoji:'🦀',active:true,cat:''},
+  {id:7,type:'topping',name:'แฮม',price:15,cost:6,emoji:'🥩',active:true,cat:''},
+  {id:8,type:'topping',name:'ไข่ดาว',price:10,cost:3,emoji:'🍳',active:true,cat:''},
+  {id:9,type:'topping',name:'ทูน่า',price:20,cost:7,emoji:'🐟',active:true,cat:''},
+  {id:10,type:'extra',name:'ชีส',price:10,cost:4,emoji:'🧀',active:true,cat:''},
+  {id:11,type:'extra',name:'มายองเนส',price:5,cost:1,emoji:'🥄',active:true,cat:''},
+  {id:12,type:'extra',name:'ซอสพิเศษ',price:5,cost:1,emoji:'🥫',active:true,cat:''},
+  {id:13,type:'extra',name:'หัวหอมทอด',price:5,cost:2,emoji:'🧅',active:true,cat:''},
+  {id:14,type:'product',name:'เครปกรอบ',price:35,cost:12,emoji:'🥞',active:true,cat:'เครปกรอบ'},
+  {id:15,type:'product',name:'เครปนิ่ม',price:30,cost:10,emoji:'🌯',active:true,cat:'เครปนิ่ม'},
+  {id:16,type:'product',name:'เครปหวานนูเทลล่า',price:45,cost:15,emoji:'🍫',active:true,cat:'เครปหวาน'},
+  {id:17,type:'product',name:'เครปหวานสตรอว์เบอร์รี',price:40,cost:13,emoji:'🍓',active:true,cat:'เครปหวาน'},
+  {id:18,type:'product',name:'ชาไทยเย็น',price:45,cost:15,emoji:'🧋',active:true,cat:'เครื่องดื่ม'},
+  {id:19,type:'product',name:'น้ำส้มคั้น',price:40,cost:12,emoji:'🍊',active:true,cat:'เครื่องดื่ม'},
+];
+
+let menu=[], cfg={name:'เครปโปร'};
+let cat='all', basket=[];
+let cur={prodId:null,doughId:null,tops:[],exts:[],qty:1};
+
+const fmt=n=>'฿'+Number(n||0).toLocaleString('th');
+const ftime=()=>new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+const isSimple=()=>{const p=menu.find(m=>m.id===cur.prodId);return p&&(p.cat==='เครปหวาน'||p.cat==='เครื่องดื่ม')};
+
+function load(){menu=DB.g('menuItems')||DEF();cfg=DB.g('config')||{name:'เครปโปร'}}
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  const b=document.querySelector('#'+id+' .scr-body');
+  if(b)b.scrollTop=0;
+}
+
+/* ── WELCOME → START ── */
+function startOrder(){
+  load();
+  cat='all';
+  document.getElementById('s1n').textContent=cfg.name||'เครปโปร';
+  renderCats();
+  renderProds();
+  updPill();
+  go('s1');
+}
+
+/* ── STEP 1: เมนู ── */
+function renderCats(){
+  // get unique cats from products
+  const prods=menu.filter(m=>m.type==='product'&&m.active);
+  const cats=[...new Set(prods.map(m=>m.cat).filter(Boolean))];
+  const el=document.getElementById('cats');
+  el.innerHTML=`<span class="chip ${cat==='all'?'on':''}" onclick="setCat('all',this)">ทั้งหมด</span>`
+    +cats.map(c=>`<span class="chip ${cat===c?'on':''}" onclick="setCat('${c}',this)">${c}</span>`).join('');
+}
+
+function setCat(c,el){
+  cat=c;
+  document.querySelectorAll('#cats .chip').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  renderProds();
+}
+
+function renderProds(){
+  const prods=menu.filter(m=>m.type==='product'&&m.active&&(cat==='all'||m.cat===cat));
+  const g=document.getElementById('pgrid');
+  if(!prods.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><i class="ti ti-mood-empty" style="font-size:40px;opacity:.3;display:block;margin-bottom:8px"></i>ไม่มีสินค้า</div>';return}
+  g.innerHTML=prods.map(p=>`
+    <div class="pcard" onclick="pickProd(${p.id})">
+      <div class="pemoji">${p.emoji||'🥞'}</div>
+      <div class="pname">${p.name}</div>
+      <div class="pcat">${p.cat}</div>
+      <div class="pprice">${fmt(p.price)}</div>
+    </div>`).join('');
+}
+
+function pickProd(id){
+  cur={prodId:id,doughId:null,tops:[],exts:[],qty:1};
+  const bases=menu.filter(m=>m.type==='base'&&m.active);
+  if(bases.length)cur.doughId=bases[0].id;
+  const p=menu.find(m=>m.id===id);
+  const lbl=p?p.emoji+' '+p.name:'';
+  document.getElementById('s2lbl').textContent=lbl;
+  document.getElementById('s3lbl').textContent=lbl;
+  if(isSimple()){renderStep4();go('s4');return}
+  renderDough();go('s2');
+}
+
+/* ── STEP 2: แป้ง ── */
+function renderDough(){
+  const p=menu.find(m=>m.id===cur.prodId);
+  if(p)document.getElementById('s2sum').innerHTML=`<strong>${p.emoji} ${p.name}</strong> เริ่มต้น ${fmt(p.price)}`;
+  const bases=menu.filter(m=>m.type==='base'&&m.active);
+  document.getElementById('dlist').innerHTML=bases.map(o=>`
+    <div class="ocard ${cur.doughId===o.id?'sel':''}" onclick="pickDough(${o.id})">
+      <div class="oemoji">${o.emoji||'🥞'}</div>
+      <div class="oradio"></div>
+      <div class="oinfo">
+        <div class="oname">${o.name}</div>
+        <div class="oprice ${o.price===0?'free':'plus'}">${o.price===0?'ฟรี':'+'+fmt(o.price)}</div>
+      </div>
+    </div>`).join('');
+}
+function pickDough(id){cur.doughId=id;renderDough()}
+
+/* ── STEP 3: หน้า + ท็อปปิ้ง รวมหน้าเดียว ── */
+function renderTopsExts(){
+  const p=menu.find(m=>m.id===cur.prodId);
+  const d=cur.doughId?menu.find(m=>m.id===cur.doughId):null;
+  document.getElementById('s3sum').innerHTML=`<strong>${p?p.emoji+' '+p.name:''}</strong>${d?' · แป้ง'+d.name:''}`;
+
+  const tops=menu.filter(m=>m.type==='topping'&&m.active);
+  document.getElementById('tlist').innerHTML=tops.map(o=>{
+    const on=cur.tops.includes(o.id);
+    return`<div class="ocard ${on?'sel':''}" onclick="togTop(${o.id})">
+      <div class="oemoji">${o.emoji||'🍖'}</div>
+      <div class="ocheck">${on?'✓':''}</div>
+      <div class="oinfo"><div class="oname">${o.name}</div><div class="oprice plus">+${fmt(o.price)}</div></div>
+    </div>`;
+  }).join('')||'<p style="color:var(--muted);font-size:13px;padding:8px 0">ยังไม่มีหน้าเครป</p>';
+
+  const exts=menu.filter(m=>m.type==='extra'&&m.active);
+  document.getElementById('elist').innerHTML=exts.map(o=>{
+    const on=cur.exts.includes(o.id);
+    return`<div class="ocard ${on?'sel':''}" onclick="togExt(${o.id})">
+      <div class="oemoji">${o.emoji||'🧀'}</div>
+      <div class="ocheck">${on?'✓':''}</div>
+      <div class="oinfo"><div class="oname">${o.name}</div><div class="oprice plus">+${fmt(o.price)}</div></div>
+    </div>`;
+  }).join('')||'<p style="color:var(--muted);font-size:13px;padding:8px 0">ยังไม่มีท็อปปิ้ง</p>';
+}
+function togTop(id){const i=cur.tops.indexOf(id);i>=0?cur.tops.splice(i,1):cur.tops.push(id);renderTopsExts()}
+function togExt(id){const i=cur.exts.indexOf(id);i>=0?cur.exts.splice(i,1):cur.exts.push(id);renderTopsExts()}
+
+/* ── STEP 4: จำนวน ── */
+function uPrice(){
+  const p=menu.find(m=>m.id===cur.prodId);if(!p)return 0;
+  let t=p.price;
+  if(cur.doughId){const o=menu.find(m=>m.id===cur.doughId);if(o)t+=o.price}
+  cur.tops.forEach(id=>{const o=menu.find(m=>m.id===id);if(o)t+=o.price});
+  cur.exts.forEach(id=>{const o=menu.find(m=>m.id===id);if(o)t+=o.price});
+  return t;
+}
+function renderStep4(){
+  const p=menu.find(m=>m.id===cur.prodId);if(!p)return;
+  const d=cur.doughId?menu.find(m=>m.id===cur.doughId):null;
+  const tops=cur.tops.map(id=>menu.find(m=>m.id===id)).filter(Boolean);
+  const exts=cur.exts.map(id=>menu.find(m=>m.id===id)).filter(Boolean);
+  const all=[...tops,...exts];
+  document.getElementById('c4em').textContent=p.emoji||'🥞';
+  document.getElementById('c4nm').textContent=p.name;
+  document.getElementById('c4dg').textContent=d?'🫓 แป้ง: '+d.name:'';
+  document.getElementById('c4op').innerHTML=all.length
+    ?all.map(o=>`<span class="tag">${o.emoji||''} ${o.name} <span style="opacity:.6">+${fmt(o.price)}</span></span>`).join('')
+    :'<span style="font-size:12px;color:var(--muted)">ไม่มีหน้า/ท็อปปิ้ง</span>';
+  cur.qty=cur.qty||1;
+  document.getElementById('c4q').textContent=cur.qty;
+  document.getElementById('c4pr').textContent=fmt(uPrice()*cur.qty);
+}
+function chQty(d){cur.qty=Math.max(1,(cur.qty||1)+d);document.getElementById('c4q').textContent=cur.qty;document.getElementById('c4pr').textContent=fmt(uPrice()*cur.qty)}
+
+/* ── BUILD ITEM ── */
+function buildItem(){
+  const p=menu.find(m=>m.id===cur.prodId);if(!p)return null;
+  const d=cur.doughId?menu.find(m=>m.id===cur.doughId):null;
+  const tops=cur.tops.map(id=>menu.find(m=>m.id===id)).filter(Boolean);
+  const exts=cur.exts.map(id=>menu.find(m=>m.id===id)).filter(Boolean);
+  const opts=[...tops,...exts];
+  const optLabels=[d?d.name:null,...tops.map(o=>o.name),...exts.map(o=>o.name)].filter(Boolean);
+  const cost=p.cost+(d?d.cost:0)+tops.reduce((s,o)=>s+o.cost,0)+exts.reduce((s,o)=>s+o.cost,0);
+  const up=uPrice();
+  const key=`${p.id}_${[cur.doughId||'d0',...cur.tops,...cur.exts].join('-')}`;
+  return{key,prodId:p.id,name:p.name,emoji:p.emoji||'🥞',dough:d?d.name:'',opts,optLabels,qty:cur.qty||1,unitPrice:up,cost};
+}
+function push(item){const ex=basket.find(b=>b.key===item.key);if(ex)ex.qty+=item.qty;else basket.push({...item})}
+
+function addCont(){
+  const item=buildItem();if(!item)return;
+  push(item);updPill();
+  cur={prodId:null,doughId:null,tops:[],exts:[],qty:1};
+  renderCats();renderProds();go('s1');
+}
+function addDone(){
+  const item=buildItem();if(!item)return;
+  push(item);updPill();
+  renderConfirm();go('sc');
+}
+
+/* ── BASKET PILL ── */
+function updPill(){
+  const pill=document.getElementById('bpill');
+  if(!basket.length){pill.classList.add('hide');return}
+  pill.classList.remove('hide');
+  const cnt=basket.reduce((s,b)=>s+b.qty,0);
+  const tot=basket.reduce((s,b)=>s+b.unitPrice*b.qty,0);
+  document.getElementById('bpilltxt').textContent=`ตะกร้า ${cnt} ชิ้น · ${fmt(tot)}`;
+}
+
+/* ── CONFIRM SCREEN ── */
+function renderConfirm(){
+  const el=document.getElementById('bcards');
+  if(!basket.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">ยังไม่มีรายการ</div>';return}
+  el.innerHTML=basket.map((b,i)=>`
+    <div class="bitem">
+      <div class="bnum">${i+1}</div>
+      <div style="font-size:26px;flex-shrink:0">${b.emoji}</div>
+      <div class="binfo">
+        <div class="bname">${b.name}</div>
+        <div class="bopts">${b.dough?'🫓 '+b.dough+'<br>':''}${b.optLabels.length?b.optLabels.join(' · '):'ไม่มีหน้า/ท็อปปิ้ง'}</div>
+        <div class="bbtns">
+          <button class="bqbtn" onclick="adj(${i},-1)">−</button>
+          <span style="font-size:14px;font-weight:900;min-width:20px;text-align:center">${b.qty}</span>
+          <button class="bqbtn" onclick="adj(${i},+1)">+</button>
+          <span style="font-size:11.5px;color:var(--muted)">${fmt(b.unitPrice)}/ชิ้น</span>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div class="bprice">${fmt(b.unitPrice*b.qty)}</div>
+        <button onclick="rem(${i})" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;margin-top:4px">ลบ ✕</button>
+      </div>
+    </div>`).join('');
+  const tot=basket.reduce((s,b)=>s+b.unitPrice*b.qty,0);
+  const cnt=basket.reduce((s,b)=>s+b.qty,0);
+  document.getElementById('bcnt').textContent=cnt+' ชิ้น';
+  document.getElementById('btot').textContent=fmt(tot);
+  document.getElementById('sendbtn').disabled=!basket.length;
+}
+function adj(i,d){basket[i].qty+=d;if(basket[i].qty<=0)basket.splice(i,1);renderConfirm();updPill();if(!basket.length)go('s1')}
+function rem(i){basket.splice(i,1);renderConfirm();updPill();if(!basket.length)go('s1')}
+
+/* ── GOOGLE SHEETS API ── */
+const GS_URL='https://script.google.com/macros/s/AKfycbyQ35RA0i-6cL_FP04T1ZuZ5rbdqzCfG1u4HapKcdwa33EnSnca-dl-5fhUMXJVAXgLpA/exec';
+
+async function gsPost(data){
+  const r=await fetch(GS_URL,{method:'POST',body:JSON.stringify(data)});
+  return r.json();
+}
+
+/* ── SEND ORDER ── */
+async function sendOrder(){
+  if(!basket.length)return;
+  const btn=document.getElementById('sendbtn');
+  btn.disabled=true;
+  btn.innerHTML='<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> กำลังส่ง...';
+
+  const items=basket.map(b=>({
+    name:b.name,emoji:b.emoji,dough:b.dough,
+    optLabels:b.optLabels,qty:b.qty,
+    unitPrice:b.unitPrice,sub:b.unitPrice*b.qty
+  }));
+  const total=basket.reduce((s,b)=>s+b.unitPrice*b.qty,0);
+  const date=new Date().toISOString().slice(0,10);
+  const time=ftime();
+
+  try{
+    const res=await gsPost({action:'addOrder',items,total,date,time});
+    if(res.ok){
+      const seq=res.id;
+      document.getElementById('snum').textContent='#'+String(seq).toString().slice(-4).padStart(4,'0');
+      document.getElementById('ssum').innerHTML=basket.map(b=>`${b.emoji} ${b.name}${b.optLabels.length?' ('+b.optLabels.slice(0,2).join(', ')+(b.optLabels.length>2?'…':'')+')':''} ×${b.qty}`).join('<br>');
+      basket=[];go('ss');
+    } else {
+      alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+      btn.disabled=false;
+      btn.innerHTML='<i class="ti ti-send"></i> ส่งออเดอร์ให้ร้าน';
+    }
+  } catch(e){
+    alert('ไม่มีการเชื่อมต่ออินเทอร์เน็ต');
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-send"></i> ส่งออเดอร์ให้ร้าน';
+  }
+}
+
+function reset(){
+  basket=[];cur={prodId:null,doughId:null,tops:[],exts:[],qty:1};
+  load();document.getElementById('wshop').textContent=cfg.name||'เครปโปร';go('sw');
+}
+
+/* ── INIT ── */
+load();
+document.getElementById('wshop').textContent=cfg.name||'เครปโปร';
+</script>
+</body>
+</html>
