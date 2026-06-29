@@ -440,13 +440,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <!-- STEP 1: เลือกเมนูหลัก -->
     <div id="wiz-step-1" class="wiz-panel" style="display:none">
       <div class="wiz-panel-title">🥞 เลือกเมนู</div>
-      <div class="scroll-tabs" id="wiz-cat-tabs">
-        <span class="chip active" onclick="setWizCat('all',this)">ทั้งหมด</span>
-        <span class="chip" onclick="setWizCat('เครปกรอบ',this)">เครปกรอบ</span>
-        <span class="chip" onclick="setWizCat('เครปนิ่ม',this)">เครปนิ่ม</span>
-        <span class="chip" onclick="setWizCat('เครปหวาน',this)">เครปหวาน</span>
-        <span class="chip" onclick="setWizCat('เครื่องดื่ม',this)">เครื่องดื่ม</span>
-      </div>
+      <div class="scroll-tabs" id="wiz-cat-tabs"></div>
       <div class="prod-grid" id="wiz-prod-grid"></div>
     </div>
 
@@ -543,6 +537,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <div class="sec-title">วัตถุดิบ</div>
     <div style="display:flex;gap:7px">
       <button class="cal-toggle-btn" onclick="calToggle('stock')"><i class="ti ti-calendar"></i></button>
+      <button class="cal-toggle-btn" onclick="exportStockCSV()" style="background:var(--green-lt);color:var(--green-dk);border-color:rgba(34,197,94,.25)"><i class="ti ti-download"></i></button>
       <button class="btn btn-sm btn-primary" onclick="openMatModal()">+ เพิ่ม</button>
     </div>
   </div>
@@ -558,6 +553,28 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
       <button class="cal-range-clear" onclick="calClear('stock')">✕ ล้าง</button>
     </div>
     <div style="margin-top:8px;font-size:11px;color:var(--orange-dk)"><span id="cal-stock-hint">กดวันเริ่มต้น</span></div>
+  </div>
+  <!-- ภาพรวม Stock (โชว์เมื่อเลือกช่วงวันที่) -->
+  <div id="stock-overview" style="display:none;margin-bottom:12px">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin-bottom:0">📊 ภาพรวม Stock</div>
+        <span id="stock-overview-range" style="font-size:11px;color:var(--orange);font-weight:700"></span>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px" id="stock-overview-table">
+          <thead>
+            <tr style="background:var(--brown-lt)">
+              <th style="padding:8px;text-align:left;font-weight:800;color:var(--brown);border-radius:8px 0 0 8px">วัตถุดิบ</th>
+              <th style="padding:8px;text-align:center;font-weight:800;color:var(--green)">รับเข้า</th>
+              <th style="padding:8px;text-align:center;font-weight:800;color:var(--red)">เบิกออก</th>
+              <th style="padding:8px;text-align:center;font-weight:800;color:var(--brown);border-radius:0 8px 8px 0">คงเหลือ</th>
+            </tr>
+          </thead>
+          <tbody id="stock-overview-body"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
   <div class="stat-grid">
     <div class="stat-card" style="--accent:var(--brown)">
@@ -576,7 +593,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <div class="page" id="page-history">
   <div class="sec-header">
     <div class="sec-title">ประวัติการขาย</div>
-    <div style="font-size:12px;color:var(--muted)" id="hist-count"></div>
+    <div style="display:flex;align-items:center;gap:7px">
+      <span style="font-size:12px;color:var(--muted)" id="hist-count"></span>
+      <button class="cal-toggle-btn" onclick="exportHistoryCSV()" style="background:var(--green-lt);color:var(--green-dk);border-color:rgba(34,197,94,.25)"><i class="ti ti-download"></i> Export</button>
+    </div>
   </div>
   <div class="search-wrap">
     <i class="ti ti-search"></i>
@@ -595,7 +615,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <div class="page" id="page-report">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
     <div class="sec-title">รายงาน</div>
-    <button class="cal-toggle-btn" onclick="calToggle('report')"><i class="ti ti-calendar"></i> ปฏิทิน</button>
+    <div style="display:flex;gap:7px">
+      <button class="cal-toggle-btn" onclick="calToggle('report')"><i class="ti ti-calendar"></i> ปฏิทิน</button>
+      <button class="cal-toggle-btn" onclick="exportCSV()" style="background:var(--green-lt);color:var(--green-dk);border-color:rgba(34,197,94,.25)"><i class="ti ti-download"></i> Export</button>
+    </div>
   </div>
   <div class="cal-wrap" id="cal-report-wrap" style="display:none">
     <div class="cal-header">
@@ -658,15 +681,24 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
     <div class="field"><label>ชื่อร้าน</label><input id="cfg-name" placeholder="เครปโปร"></div>
     <div class="field"><label>ที่อยู่</label><input id="cfg-addr" placeholder="กรุงเทพฯ"></div>
     <div class="field"><label>เบอร์โทร</label><input id="cfg-phone" type="tel" placeholder="08x-xxx-xxxx"></div>
-    <button class="btn btn-primary" onclick="saveConfig()">บันทึก</button>
+    <button class="btn btn-primary" onclick="saveConfig()"><i class="ti ti-device-floppy"></i> บันทึก</button>
   </div>
   <div class="card mt">
-    <div class="card-title">QR พร้อมเพย์</div>
-    <div class="field"><label>หมายเลขพร้อมเพย์</label><input id="cfg-promptpay" placeholder="0812345678"></div>
-    <button class="btn btn-primary" onclick="saveConfig()">บันทึก</button>
+    <div class="card-title">💳 QR พร้อมเพย์</div>
+    <div class="field"><label>หมายเลขพร้อมเพย์</label><input id="cfg-promptpay" type="tel" placeholder="0812345678"></div>
+    <div id="cfg-qr-preview" style="text-align:center;padding:8px 0;display:none">
+      <div id="cfg-qr-box" style="display:inline-block;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:10px"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">ตัวอย่าง QR</div>
+    </div>
+    <button class="btn btn-ghost" onclick="previewSettingsQR()" style="margin-bottom:8px"><i class="ti ti-qrcode"></i> ดูตัวอย่าง QR</button>
+    <button class="btn btn-primary" onclick="saveConfig()"><i class="ti ti-device-floppy"></i> บันทึก</button>
   </div>
   <div class="card mt">
     <div class="card-title">ข้อมูลระบบ</div>
+    <div class="setting-row">
+      <div><div class="setting-label">เสียงแจ้งเตือนออเดอร์</div><div class="setting-sub">ดังเมื่อมีออเดอร์ใหม่จากลูกค้า</div></div>
+      <button class="btn btn-sm btn-ghost" onclick="testSound()"><i class="ti ti-volume"></i> ทดสอบ</button>
+    </div>
     <div class="setting-row">
       <div><div class="setting-label">ออเดอร์ทั้งหมด</div><div class="setting-sub">นับตั้งแต่เริ่มใช้</div></div>
       <div style="font-weight:800;color:var(--orange)" id="cfg-total-orders">0</div>
@@ -705,17 +737,30 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
         <option value="product">📋 เมนูหลัก</option>
       </select>
     </div>
-    <div id="mm-prod-cat-field" class="field" style="display:none"><label>หมวดเมนู</label>
-      <select id="mm-prod-cat">
-        <option value="เครปกรอบ">🥞 เครปกรอบ</option>
-        <option value="เครปนิ่ม">🌯 เครปนิ่ม</option>
-        <option value="เครปหวาน">🍓 เครปหวาน</option>
-        <option value="เครื่องดื่ม">🧋 เครื่องดื่ม</option>
-      </select>
+    <div id="mm-prod-cat-field" class="field" style="display:none">
+      <label>หมวดเมนู</label>
+      <div style="display:flex;gap:7px;margin-bottom:8px">
+        <input id="mm-prod-cat" placeholder="พิมพ์หรือเลือกหมวด" style="flex:1;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;outline:none" oninput="filterCatSuggestions(this.value)" onfocus="showCatSuggestions()" onblur="setTimeout(hideCatSuggestions,200)">
+      </div>
+      <div id="cat-suggestions" style="display:none;background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-top:-4px;margin-bottom:8px"></div>
+      <div style="font-size:11.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px">หมวดที่มีอยู่</div>
+      <div id="cat-chip-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
     <div class="field"><label>ราคา (บาท)</label><input id="mm-price" type="number" min="0" placeholder="0"></div>
     <div id="mm-cost-field" class="field"><label>ต้นทุน (บาท)</label><input id="mm-cost" type="number" min="0" placeholder="0"></div>
     <div class="field"><label>Emoji / ไอคอน</label><input id="mm-emoji" placeholder="🧀"></div>
+    <div class="field">
+      <label>รูปภาพเมนู (ถ้ามีรูปจะใช้แทน Emoji)</label>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <div id="mm-img-preview" style="width:60px;height:60px;border-radius:10px;background:var(--border);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden"></div>
+        <div style="flex:1">
+          <input type="file" id="mm-img-file" accept="image/*" onchange="previewMenuImg(this)" style="display:none">
+          <button class="btn btn-sm btn-ghost" onclick="document.getElementById('mm-img-file').click()" style="width:100%;margin-bottom:6px"><i class="ti ti-upload"></i> อัปโหลดรูป</button>
+          <button class="btn btn-sm btn-secondary" onclick="clearMenuImg()" style="width:100%;font-size:11px">ลบรูป</button>
+        </div>
+      </div>
+      <input type="hidden" id="mm-img">
+    </div>
     <div class="field" style="display:flex;align-items:center;justify-content:space-between">
       <label style="font-size:11.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">สถานะเปิดขาย</label>
       <label class="switch"><input type="checkbox" id="mm-active" checked><span class="slider"></span></label>
@@ -743,6 +788,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   </div>
 </div>
 
+<!-- MODAL: STOCK HISTORY -->
+<div class="modal-bg" id="modal-stock-history">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div class="modal-title" id="msh-title" style="margin-bottom:0">ประวัติ</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" id="msh-tab-day" onclick="setStockHistTab('day',this)" style="background:var(--orange);color:#fff;border:none">รายวัน</button>
+        <button class="btn btn-sm btn-secondary" id="msh-tab-month" onclick="setStockHistTab('month',this)">รายเดือน</button>
+      </div>
+    </div>
+    <div id="msh-content"></div>
+    <button class="btn btn-secondary" style="margin-top:14px" onclick="closeModal('modal-stock-history')">ปิด</button>
+  </div>
+</div>
+
 <!-- MODAL: STOCK ACTION -->
 <div class="modal-bg" id="modal-stock-action">
   <div class="modal">
@@ -767,8 +827,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <div class="modal-bg" id="modal-qr">
   <div class="modal">
     <div class="modal-title">💳 QR พร้อมเพย์</div>
-    <div class="field"><label>หมายเลขพร้อมเพย์</label><input id="qr-number" placeholder="0812345678" oninput="genQR()"></div>
-    <div class="field"><label>ยอดชำระ (บาท)</label><input id="qr-amount" type="number" oninput="genQR()"></div>
+    <div style="background:var(--orange-lt);border-radius:10px;padding:10px 13px;margin-bottom:14px;font-size:13px;color:var(--orange-dk);display:flex;align-items:center;gap:7px">
+      <i class="ti ti-lock" style="flex-shrink:0"></i>
+      <span>แก้ไขเบอร์และยอดได้ที่ <b>ตั้งค่า → QR พร้อมเพย์</b></span>
+    </div>
+    <div class="field">
+      <label>หมายเลขพร้อมเพย์</label>
+      <input id="qr-number" readonly style="background:var(--border);color:var(--muted);cursor:not-allowed" oninput="genQR()">
+    </div>
+    <div class="field">
+      <label>ยอดชำระ (บาท)</label>
+      <input id="qr-amount" type="number" readonly style="background:var(--border);color:var(--muted);cursor:not-allowed" oninput="genQR()">
+    </div>
     <div style="text-align:center;padding:12px 0">
       <div id="qr-box" style="background:#fff;border:2px solid var(--border);border-radius:12px;padding:12px;display:inline-block"></div>
       <div style="font-size:12px;color:var(--muted);margin-top:6px">สแกนด้วยแอปธนาคาร</div>
@@ -1078,12 +1148,19 @@ function renderWizStep(){
 
 // Step 1: เมนูหลัก
 function renderWizProdGrid(){
-  const prods = menuItems.filter(m=>m.type==='product'&&m.active&&(wizCat==='all'||m.cat===wizCat));
+  // render dynamic cat tabs
+  const prods = menuItems.filter(m=>m.type==='product'&&m.active);
+  const cats = [...new Set(prods.map(m=>m.cat).filter(Boolean))];
+  const tabEl = document.getElementById('wiz-cat-tabs');
+  tabEl.innerHTML = `<span class="chip ${wizCat==='all'?'active':''}" onclick="setWizCat('all',this)">ทั้งหมด</span>`
+    + cats.map(c=>`<span class="chip ${wizCat===c?'active':''}" onclick="setWizCat('${c}',this)">${c}</span>`).join('');
+
+  const filtered = prods.filter(m=>wizCat==='all'||m.cat===wizCat);
   const grid = document.getElementById('wiz-prod-grid');
-  if(!prods.length){ grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-mood-empty"></i><p>ไม่มีสินค้า</p></div>'; return; }
-  grid.innerHTML = prods.map(p=>`
+  if(!filtered.length){ grid.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-mood-empty"></i><p>ไม่มีสินค้า</p></div>'; return; }
+  grid.innerHTML = filtered.map(p=>`
     <div class="prod-card ${wizBuild.prodId===p.id?'wiz-selected-prod':''}" onclick="wizSelectProduct(${p.id})" style="${wizBuild.prodId===p.id?'border-color:var(--orange);background:var(--orange-lt)':''}">
-      <div class="prod-emoji">${p.emoji||'🥞'}</div>
+      <div class="prod-emoji" style="overflow:hidden">${p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">`:p.emoji||'🥞'}</div>
       <div class="prod-name">${p.name}</div>
       <div class="prod-price">${fmt(p.price)}</div>
       <div class="prod-sub">${p.cat}</div>
@@ -1310,6 +1387,17 @@ function posCheckout(){
   openModal('modal-qr');
 }
 
+function checkout(){
+  if(!cart.length){ toast('⚠️ ยังไม่มีสินค้า'); return; }
+  const sub = cart.reduce((s,c)=>s+c.unitPrice*c.qty,0);
+  const disc = calcDisc(sub);
+  document.getElementById('qr-amount').value = Math.max(0,sub-disc);
+  document.getElementById('qr-number').value = config.promptpay||'';
+  genQR();
+  closeDrawer('drawer-cart');
+  openModal('modal-qr');
+}
+
 // ===================== POS (legacy wrappers kept for NAV) =====================
 function renderPOSGrid(){ /* replaced by wizard */ }
 function setPOSCat(){ /* no-op */ }
@@ -1424,7 +1512,9 @@ function renderMenuList(){
     <div class="menu-card">
       <div class="menu-card-header">
         <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:28px">${m.emoji||'🥞'}</span>
+          <div style="width:44px;height:44px;border-radius:10px;background:var(--orange-lt);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0">
+            ${m.img?`<img src="${m.img}" style="width:100%;height:100%;object-fit:cover">`:m.emoji||'🥞'}
+          </div>
           <div>
             <div style="font-size:15px;font-weight:800">${m.name}</div>
             <div style="font-size:12px;color:var(--muted);margin-top:2px">
@@ -1449,10 +1539,16 @@ function openMenuModal(){
   document.getElementById('mm-price').value='';
   document.getElementById('mm-cost').value='';
   document.getElementById('mm-emoji').value='';
+  document.getElementById('mm-img').value='';
+  document.getElementById('mm-img-file').value='';
+  document.getElementById('mm-img-preview').textContent='🥞';
   document.getElementById('mm-active').checked=true;
   document.getElementById('mm-cat').value=menuTab;
   document.getElementById('mm-type').value=menuTab;
-  document.getElementById('mm-prod-cat-field').style.display = menuTab==='product'?'block':'none';
+  document.getElementById('mm-prod-cat').value='';
+  const showCat = menuTab==='product';
+  document.getElementById('mm-prod-cat-field').style.display = showCat?'block':'none';
+  if(showCat) renderCatChips();
   openModal('modal-menu');
 }
 
@@ -1464,27 +1560,86 @@ function editMenuItem(id){
   document.getElementById('mm-price').value=m.price;
   document.getElementById('mm-cost').value=m.cost;
   document.getElementById('mm-emoji').value=m.emoji||'';
+  document.getElementById('mm-img').value=m.img||'';
+  const prev=document.getElementById('mm-img-preview');
+  if(m.img) prev.innerHTML=`<img src="${m.img}" style="width:100%;height:100%;object-fit:cover">`;
+  else prev.textContent=m.emoji||'🥞';
   document.getElementById('mm-active').checked=m.active;
   document.getElementById('mm-cat').value=m.type;
   document.getElementById('mm-type').value=m.type;
-  document.getElementById('mm-prod-cat-field').style.display = m.type==='product'?'block':'none';
-  if(m.cat) document.getElementById('mm-prod-cat').value=m.cat;
+  document.getElementById('mm-prod-cat').value=m.cat||'';
+  const showCat = m.type==='product';
+  document.getElementById('mm-prod-cat-field').style.display = showCat?'block':'none';
+  if(showCat) renderCatChips();
   openModal('modal-menu');
 }
 
-document.getElementById('mm-cat').addEventListener('change', function(){ document.getElementById('mm-prod-cat-field').style.display = this.value==='product'?'block':'none'; });
+document.getElementById('mm-cat').addEventListener('change', function(){
+  const show = this.value==='product';
+  document.getElementById('mm-prod-cat-field').style.display = show?'block':'none';
+  if(show) renderCatChips();
+});
+
+// ── CATEGORY MANAGEMENT ──
+function getCategories(){
+  return [...new Set(menuItems.filter(m=>m.type==='product'&&m.cat).map(m=>m.cat))];
+}
+
+function renderCatChips(){
+  const cats = getCategories();
+  document.getElementById('cat-chip-list').innerHTML = cats.map(c=>`
+    <div style="display:inline-flex;align-items:center;gap:5px;background:var(--orange-lt);color:var(--orange-dk);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer" onclick="selectCat('${c}')">
+      ${c}
+      <span onclick="event.stopPropagation();deleteCategory('${c}')" style="color:var(--red);font-weight:900;font-size:13px;line-height:1;padding-left:2px">×</span>
+    </div>`).join('');
+}
+
+function selectCat(c){
+  document.getElementById('mm-prod-cat').value = c;
+  hideCatSuggestions();
+}
+
+function filterCatSuggestions(val){
+  const cats = getCategories().filter(c=>c.includes(val));
+  const el = document.getElementById('cat-suggestions');
+  if(!cats.length||!val){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.innerHTML = cats.map(c=>`
+    <div onclick="selectCat('${c}')" style="padding:10px 13px;cursor:pointer;font-size:14px;font-weight:600;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--orange-lt)'" onmouseout="this.style.background=''">${c}</div>
+  `).join('');
+}
+
+function showCatSuggestions(){
+  renderCatChips();
+  filterCatSuggestions(document.getElementById('mm-prod-cat').value);
+}
+
+function hideCatSuggestions(){
+  document.getElementById('cat-suggestions').style.display='none';
+}
+
+function deleteCategory(cat){
+  const count = menuItems.filter(m=>m.cat===cat).length;
+  if(!confirm(`ลบหมวด "${cat}"?\nมีเมนู ${count} รายการในหมวดนี้ (เมนูจะยังอยู่ แต่ไม่มีหมวด)`)) return;
+  menuItems.forEach(m=>{ if(m.cat===cat) m.cat=''; });
+  save(); renderCatChips(); renderMenuList();
+  toast(`🗑️ ลบหมวด "${cat}" แล้ว`);
+}
 
 function saveMenuItem(){
   const id = document.getElementById('mm-id').value;
   const name = document.getElementById('mm-name').value.trim();
   if(!name){ toast('⚠️ กรอกชื่อด้วยนะครับ'); return; }
   const type = document.getElementById('mm-cat').value;
+  const cat = type==='product'?(document.getElementById('mm-prod-cat').value.trim()||''):'';
+  if(type==='product'&&!cat){ toast('⚠️ กรอกหมวดเมนูด้วยนะครับ'); return; }
   const data = {
     name, type, price:+document.getElementById('mm-price').value||0,
     cost:+document.getElementById('mm-cost').value||0,
     emoji:document.getElementById('mm-emoji').value||'🥞',
+    img: document.getElementById('mm-img').value||'',
     active:document.getElementById('mm-active').checked,
-    cat: type==='product'?document.getElementById('mm-prod-cat').value:''
+    cat
   };
   if(id){ const m=menuItems.find(x=>x.id==id); Object.assign(m,data); toast('✅ แก้ไขแล้ว'); }
   else { menuItems.push({id:_mid++,...data}); toast('✅ เพิ่มแล้ว'); }
@@ -1502,7 +1657,119 @@ function deleteMenuItem(id){
   menuItems=menuItems.filter(m=>m.id!==id); save(); renderMenuList(); toast('🗑️ ลบแล้ว');
 }
 
-// ===================== STOCK =====================
+// ===================== STOCK HISTORY =====================
+let _stockHistId = null;
+let _stockHistTab = 'day';
+
+function openStockHistory(id){
+  _stockHistId = id;
+  _stockHistTab = 'day';
+  const m = materials.find(x=>x.id===id);
+  document.getElementById('msh-title').textContent = `📦 ${m.name} (${m.unit})`;
+  setStockHistTab('day', document.getElementById('msh-tab-day'));
+  openModal('modal-stock-history');
+}
+
+function setStockHistTab(tab, el){
+  _stockHistTab = tab;
+  document.querySelectorAll('#modal-stock-history .btn-sm').forEach(b=>{
+    b.style.background=''; b.style.color=''; b.className='btn btn-sm btn-secondary';
+  });
+  el.className='btn btn-sm';
+  el.style.background='var(--orange)'; el.style.color='#fff';
+  renderStockHistory();
+}
+
+function renderStockHistory(){
+  const m = materials.find(x=>x.id===_stockHistId);
+  if(!m){ document.getElementById('msh-content').innerHTML=''; return; }
+  const log = m.log||[];
+  const el = document.getElementById('msh-content');
+
+  if(!log.length){
+    el.innerHTML='<div class="empty-state"><i class="ti ti-history"></i><p>ยังไม่มีประวัติ</p></div>';
+    return;
+  }
+
+  if(_stockHistTab==='day'){
+    // group by date
+    const byDate = {};
+    log.forEach(l=>{
+      const d = l.date||'ไม่ระบุ';
+      if(!byDate[d]) byDate[d]={in:0,out:0,adj:0,logs:[]};
+      if(l.type==='in') byDate[d].in+=l.qty;
+      else if(l.type==='out') byDate[d].out+=l.qty;
+      else byDate[d].adj=l.qty;
+      byDate[d].logs.push(l);
+    });
+    const dates = Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+    el.innerHTML = dates.map(d=>{
+      const g = byDate[d];
+      return `<div class="card" style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:13px;font-weight:800;color:var(--brown)">${d}</div>
+          <div style="display:flex;gap:8px;font-size:12px;font-weight:700">
+            ${g.in?`<span style="color:var(--green)">+${g.in}</span>`:''}
+            ${g.out?`<span style="color:var(--red)">-${g.out}</span>`:''}
+            ${g.adj?`<span style="color:var(--blue)">=${g.adj}</span>`:''}
+          </div>
+        </div>
+        ${g.logs.map(l=>`
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:4px 0;border-top:1px solid var(--border)">
+            <span>${l.type==='in'?'📥 รับเข้า':l.type==='out'?'📤 เบิกออก':'🔧 ปรับยอด'} ${l.time||''}</span>
+            <span style="font-weight:700;color:${l.type==='in'?'var(--green)':l.type==='out'?'var(--red)':'var(--blue)'}">
+              ${l.type==='in'?'+':l.type==='out'?'-':'='} ${l.qty} ${m.unit}
+            </span>
+          </div>
+          ${l.note?`<div style="font-size:11px;color:var(--muted);padding:2px 0 4px">💬 ${l.note}</div>`:''}`).join('')}
+      </div>`;
+    }).join('');
+
+  } else {
+    // group by month
+    const byMonth = {};
+    log.forEach(l=>{
+      const mo = (l.date||'').slice(0,7)||'ไม่ระบุ';
+      if(!byMonth[mo]) byMonth[mo]={in:0,out:0,days:new Set()};
+      if(l.type==='in') byMonth[mo].in+=l.qty;
+      else if(l.type==='out') byMonth[mo].out+=l.qty;
+      if(l.date) byMonth[mo].days.add(l.date);
+    });
+    const months = Object.keys(byMonth).sort((a,b)=>b.localeCompare(a));
+    const MONTHS_TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+    el.innerHTML = months.map(mo=>{
+      const g = byMonth[mo];
+      const [y,mn] = mo.split('-');
+      const label = mn ? `${MONTHS_TH[+mn-1]} ${+y+543}` : mo;
+      const maxBar = Math.max(g.in,g.out)||1;
+      return `<div class="card" style="margin-bottom:8px">
+        <div style="font-size:13px;font-weight:800;color:var(--brown);margin-bottom:10px">${label}</div>
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <div style="flex:1;background:var(--green-lt);border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:var(--green);font-weight:700">รับเข้า</div>
+            <div style="font-size:18px;font-weight:900;color:var(--green)">+${g.in}</div>
+          </div>
+          <div style="flex:1;background:var(--red-lt);border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:var(--red);font-weight:700">เบิกออก</div>
+            <div style="font-size:18px;font-weight:900;color:var(--red)">-${g.out}</div>
+          </div>
+          <div style="flex:1;background:var(--blue-lt);border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:var(--blue);font-weight:700">วันที่เคลื่อนไหว</div>
+            <div style="font-size:18px;font-weight:900;color:var(--blue)">${g.days.size}</div>
+          </div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-meta"><span>รับเข้า</span><span style="color:var(--green)">${g.in} ${m.unit}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(g.in/maxBar*100).toFixed(0)}%;background:var(--green)"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-meta"><span>เบิกออก</span><span style="color:var(--red)">${g.out} ${m.unit}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(g.out/maxBar*100).toFixed(0)}%;background:var(--red)"></div></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
 function renderStock(){
   document.getElementById('sk-count').textContent = materials.length;
   document.getElementById('sk-val').textContent = fmt(materials.reduce((s,m)=>s+m.qty*m.price,0));
@@ -1527,6 +1794,7 @@ function renderStock(){
       <div style="display:flex;gap:7px;margin-top:10px;flex-wrap:wrap">
         <button class="btn btn-sm btn-green" onclick="openStockAction(${m.id},'in')">📥 รับเข้า</button>
         <button class="btn btn-sm btn-amber" onclick="openStockAction(${m.id},'out')">📤 เบิก</button>
+        <button class="btn btn-sm" style="background:var(--blue-lt);color:var(--blue)" onclick="openStockHistory(${m.id})"><i class="ti ti-history"></i> ประวัติ</button>
         <button class="btn btn-sm btn-ghost" onclick="editMat(${m.id})">✏️</button>
         <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="deleteMat(${m.id})">🗑️</button>
       </div>
@@ -1720,21 +1988,43 @@ function renderReport(){
 
 // ===================== SETTINGS =====================
 function renderSettings(){
-  document.getElementById('cfg-name').value=config.name||'';
-  document.getElementById('cfg-addr').value=config.addr||'';
-  document.getElementById('cfg-phone').value=config.phone||'';
-  document.getElementById('cfg-promptpay').value=config.promptpay||'';
-  document.getElementById('cfg-total-orders').textContent=sales.filter(s=>!s.cancelled).length;
-  document.getElementById('cfg-total-rev').textContent=fmt(sales.filter(s=>!s.cancelled).reduce((s,x)=>s+x.total,0));
+  // โหลดค่าปัจจุบันจาก config เสมอ
+  document.getElementById('cfg-name').value     = config.name||'';
+  document.getElementById('cfg-addr').value     = config.addr||'';
+  document.getElementById('cfg-phone').value    = config.phone||'';
+  document.getElementById('cfg-promptpay').value= config.promptpay||'';
+  document.getElementById('cfg-total-orders').textContent = sales.filter(s=>!s.cancelled).length;
+  document.getElementById('cfg-total-rev').textContent    = fmt(sales.filter(s=>!s.cancelled).reduce((s,x)=>s+x.total,0));
+  // ซ่อน QR preview ทุกครั้งที่เปิดหน้า
+  document.getElementById('cfg-qr-preview').style.display='none';
+}
+
+function previewSettingsQR(){
+  const num = document.getElementById('cfg-promptpay').value.trim();
+  if(!num){ toast('⚠️ กรอกเบอร์พร้อมเพย์ก่อน'); return; }
+  const preview = document.getElementById('cfg-qr-preview');
+  const box     = document.getElementById('cfg-qr-box');
+  preview.style.display='block';
+  box.innerHTML=`<img src="https://promptpay.io/${num}/0.png" style="width:160px;height:160px" onerror="this.parentElement.innerHTML='<div style=padding:12px;text-align:center;font-size:13px>${num}</div>'">`;
 }
 
 function saveConfig(){
-  config.name=document.getElementById('cfg-name').value;
-  config.addr=document.getElementById('cfg-addr').value;
-  config.phone=document.getElementById('cfg-phone').value;
-  config.promptpay=document.getElementById('cfg-promptpay').value;
-  save(); toast('✅ บันทึกแล้ว');
-  document.querySelector('.topbar .logo').innerHTML=`🥞 <span>${config.name||'เครปโปร'}</span> <span class="sub">POS System</span>`;
+  config.name    = document.getElementById('cfg-name').value.trim()||'เครปโปร';
+  config.addr    = document.getElementById('cfg-addr').value.trim();
+  config.phone   = document.getElementById('cfg-phone').value.trim();
+  config.promptpay = document.getElementById('cfg-promptpay').value.trim();
+  save();
+
+  // อัปเดต topbar ชื่อร้าน
+  document.querySelector('.topbar .logo').innerHTML=
+    `🥞 <span>${config.name}</span> <span class="sub">POS System</span>`;
+
+  // อัปเดต QR modal input ทันที (ใช้เบอร์ใหม่เลย)
+  const qrNum = document.getElementById('qr-number');
+  if(qrNum) qrNum.value = config.promptpay||'';
+
+  // อัปเดตช่อง promptpay ใน modal ทุกครั้งที่เปิด checkout
+  toast('✅ บันทึกแล้ว');
 }
 
 function clearData(){
@@ -1775,6 +2065,7 @@ async function pollCustomerOrders(){
     const newOnes = pending.filter(o=>!_knownOrderIds.has(String(o.id)));
     if(newOnes.length){
       newOnes.forEach(o=>_knownOrderIds.add(String(o.id)));
+      playOrderSound();
       // flash title if not on POS page
       if(!document.getElementById('page-pos').classList.contains('active')){
         document.title='🔔 มีออเดอร์ใหม่!';
@@ -1791,8 +2082,8 @@ async function pollCustomerOrders(){
           <span class="incoming-num">🔔 ออเดอร์ #${String(o.id).slice(-4)}</span>
           <span class="incoming-time">${o.time||''}</span>
         </div>
-        <div class="incoming-items">${(o.items||[]).map(i=>`${i.emoji||'🥞'} <b>${i.name}</b>${i.optLabels&&i.optLabels.length?' ('+i.optLabels.join(', ')+')':''} ×${i.qty} <span style="color:var(--orange);font-weight:800">฿${i.sub}</span>`).join('<br>')}</div>
-        <div class="incoming-total">ยอดรวม ฿${o.total}</div>
+        <div class="incoming-items">${(o.items||[]).map(i=>`${i.emoji||'🥞'} <b>${i.name}</b>${i.optLabels&&i.optLabels.length?' ('+i.optLabels.join(', ')+')':''} ×${i.qty} <span style="color:var(--orange);font-weight:800">${fmt(i.sub||0)}</span>`).join('<br>')}</div>
+        <div class="incoming-total">ยอดรวม ${fmt(o.total||0)}</div>
         <div class="incoming-actions">
           <button class="btn btn-sm btn-green" onclick="acceptCustomerOrder('${o.id}',${JSON.stringify(o.items||[]).replace(/'/g,"&#39;")})" style="flex:1">✅ รับออเดอร์ลง POS</button>
           <button class="btn btn-sm btn-red" onclick="dismissCustomerOrder('${o.id}')" style="flex:1">❌ ปฏิเสธ</button>
@@ -1872,6 +2163,7 @@ function calClear(page){
   // reset data
   if(page==='dash') renderDash();
   if(page==='report') renderReport();
+  if(page==='stock'){ document.getElementById('stock-overview').style.display='none'; }
 }
 
 function calSelect(page, ds){
@@ -2007,9 +2299,191 @@ function renderReportForRange(from, to){
 }
 
 function renderStockForRange(from, to){
-  // just highlight — stock page shows materials not sales, so toast info
-  const ss = sales.filter(s=>!s.cancelled && s.date>=from && s.date<=to);
-  toast(`📅 ${from} → ${to} · ${ss.length} ออเดอร์`);
+  // ภาพรวม stock ในช่วงวันที่
+  const overview = document.getElementById('stock-overview');
+  const body = document.getElementById('stock-overview-body');
+  const rangeLabel = document.getElementById('stock-overview-range');
+
+  overview.style.display = 'block';
+  rangeLabel.textContent = `${from} → ${to}`;
+
+  body.innerHTML = materials.map(m=>{
+    const log = (m.log||[]).filter(l=>l.date>=from&&l.date<=to);
+    const inQty  = log.filter(l=>l.type==='in').reduce((s,l)=>s+l.qty,0);
+    const outQty = log.filter(l=>l.type==='out').reduce((s,l)=>s+l.qty,0);
+    const hasActivity = inQty||outQty;
+    return `<tr style="border-bottom:1px solid var(--border);${!hasActivity?'opacity:.4':''}">
+      <td style="padding:8px;font-weight:700">${m.name} <span style="color:var(--muted);font-weight:400">${m.unit}</span></td>
+      <td style="padding:8px;text-align:center;color:var(--green);font-weight:800">${inQty?'+'+inQty:'-'}</td>
+      <td style="padding:8px;text-align:center;color:var(--red);font-weight:800">${outQty?'-'+outQty:'-'}</td>
+      <td style="padding:8px;text-align:center;font-weight:800;color:var(--brown)">${m.qty} ${m.unit}</td>
+    </tr>`;
+  }).join('');
+
+  toast(`📊 ภาพรวม ${from} → ${to}`);
+}
+
+// ── EXPORT STOCK CSV ──
+function exportStockCSV(){
+  const { rangeStart, rangeEnd } = calState.stock;
+  const from = rangeStart || '2000-01-01';
+  const to   = rangeEnd   || today();
+
+  const rows = [['วัตถุดิบ','หน่วย','รับเข้า','เบิกออก','คงเหลือ','ตำแหน่ง']];
+  materials.forEach(m=>{
+    const log = (m.log||[]).filter(l=>!rangeStart||(l.date>=from&&l.date<=to));
+    const inQty  = log.filter(l=>l.type==='in').reduce((s,l)=>s+l.qty,0);
+    const outQty = log.filter(l=>l.type==='out').reduce((s,l)=>s+l.qty,0);
+    rows.push([m.name, m.unit, inQty, outQty, m.qty, m.loc||'']);
+  });
+
+  // detail log rows
+  rows.push([]);
+  rows.push(['=== รายละเอียดการเคลื่อนไหว ===']);
+  rows.push(['วัตถุดิบ','วันที่','เวลา','ประเภท','จำนวน','หมายเหตุ']);
+  materials.forEach(m=>{
+    const log = (m.log||[]).filter(l=>!rangeStart||(l.date>=from&&l.date<=to));
+    log.forEach(l=>{
+      rows.push([m.name, l.date||'', l.time||'',
+        l.type==='in'?'รับเข้า':l.type==='out'?'เบิกออก':'ปรับยอด',
+        l.qty, l.note||'']);
+    });
+  });
+
+  dlCSV(rows, `stock-${from}-${to}.csv`);
+  toast('✅ Export Stock แล้ว');
+}
+
+// ── EXPORT HISTORY CSV ──
+function exportHistoryCSV(){
+  const q = (document.getElementById('hist-search').value||'').toLowerCase().trim();
+  const td=today(), tw=thisWeekStart(), tm2=thisMonth();
+  const shown = sales.filter(s=>{
+    if(histPeriod==='today'&&s.date!==td) return false;
+    if(histPeriod==='week'&&s.date<tw) return false;
+    if(histPeriod==='month'&&!s.date.startsWith(tm2)) return false;
+    if(q){
+      const names=(s.items||[]).map(i=>i.name.toLowerCase()+' '+(i.optLabels||[]).join(' ').toLowerCase()).join(' ');
+      if(!names.includes(q)&&!(s.date||'').includes(q)&&!String(s.total||'').includes(q)) return false;
+    }
+    return true;
+  });
+
+  if(!shown.length){ toast('⚠️ ไม่มีข้อมูล'); return; }
+
+  const rows = [['ออเดอร์','วันที่','เวลา','รายการ','ยอดขาย','ส่วนลด','ยอดสุทธิ','กำไร','สถานะ']];
+  shown.forEach((s,i)=>{
+    const items = (s.items||[]).map(i=>i.name+(i.optLabels&&i.optLabels.length?' ('+i.optLabels.join('+')+')':'')+' x'+i.qty).join(' | ');
+    rows.push([i+1, s.date, s.time, items, s.subtotal||s.total, s.discount||0, s.total, s.profit||0, s.cancelled?'ยกเลิก':'เสร็จแล้ว']);
+  });
+
+  // summary row
+  rows.push([]);
+  rows.push(['รวม','','','', shown.reduce((s,x)=>s+(x.subtotal||x.total),0), shown.reduce((s,x)=>s+(x.discount||0),0), shown.reduce((s,x)=>s+x.total,0), shown.reduce((s,x)=>s+(x.profit||0),0),'']);
+
+  dlCSV(rows, `history-${today()}.csv`);
+  toast('✅ Export ประวัติแล้ว');
+}
+
+// ── shared CSV download helper ──
+function dlCSV(rows, filename){
+  const bom = '\uFEFF';
+  const csv = rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([bom+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===================== 🔔 SOUND ALERT =====================
+let _audioCtx = null;
+
+function getAudioCtx(){
+  if(!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(_audioCtx.state==='suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+// unlock audio ทันทีที่ผู้ใช้แตะหน้าจอครั้งแรก
+document.addEventListener('touchstart', ()=>{ try{ getAudioCtx(); }catch(e){} }, {once:true});
+document.addEventListener('click', ()=>{ try{ getAudioCtx(); }catch(e){} }, {once:true});
+
+function playOrderSound(){
+  try{
+    const ctx = getAudioCtx();
+    const beep = (freq, start, dur) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freq;
+      o.type = 'triangle';
+      g.gain.setValueAtTime(0, ctx.currentTime+start);
+      g.gain.linearRampToValueAtTime(0.5, ctx.currentTime+start+0.02);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+start+dur);
+      o.start(ctx.currentTime+start);
+      o.stop(ctx.currentTime+start+dur+0.05);
+    };
+    beep(880,  0,    0.15);
+    beep(1100, 0.18, 0.15);
+    beep(1320, 0.36, 0.25);
+  } catch(e){ console.warn('sound error',e); }
+}
+
+function testSound(){
+  try{
+    getAudioCtx();
+    playOrderSound();
+    toast('🔔 ทดสอบเสียง!');
+  } catch(e){
+    toast('⚠️ browser บล็อกเสียง ลองกดปุ่มอื่นก่อน');
+  }
+}
+
+// ===================== 📊 EXPORT CSV =====================
+function exportCSV(){
+  const ss = filterSales();
+  if(!ss.length){ toast('⚠️ ไม่มีข้อมูลในช่วงนี้'); return; }
+
+  const rows = [
+    ['วันที่','เวลา','รายการ','ยอดขาย','ส่วนลด','ยอดสุทธิ','กำไร']
+  ];
+  ss.forEach(s=>{
+    const items = (s.items||[]).map(i=>i.name+(i.optLabels&&i.optLabels.length?' ('+i.optLabels.join('+')+')':'')+' x'+i.qty).join(' | ');
+    rows.push([s.date, s.time, items, s.subtotal||s.total, s.discount||0, s.total, s.profit||0]);
+  });
+
+  const csv = rows.map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  dlCSV(rows, `crepe-report-${today()}.csv`);
+  toast('✅ Export CSV แล้ว');
+}
+
+// ===================== 🖼️ MENU IMAGE =====================
+function previewMenuImg(input){
+  const file = input.files[0]; if(!file) return;
+  if(file.size > 500*1024){ toast('⚠️ รูปใหญ่เกิน 500KB'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = e.target.result;
+    document.getElementById('mm-img').value = data;
+    const prev = document.getElementById('mm-img-preview');
+    prev.innerHTML=`<img src="${data}" style="width:100%;height:100%;object-fit:cover">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearMenuImg(){
+  document.getElementById('mm-img').value='';
+  document.getElementById('mm-img-file').value='';
+  const prev = document.getElementById('mm-img-preview');
+  const emoji = document.getElementById('mm-emoji').value||'🥞';
+  prev.textContent = emoji;
+}
+
+function getMenuDisplay(m){
+  // returns img tag or emoji
+  if(m.img) return `<img src="${m.img}" style="width:100%;height:100%;object-fit:cover;border-radius:9px">`;
+  return m.emoji||'🥞';
 }
 
 // ===================== INIT =====================
